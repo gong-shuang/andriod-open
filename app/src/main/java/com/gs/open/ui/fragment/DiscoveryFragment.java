@@ -1,0 +1,43 @@
+package com.gs.open.ui.fragment;
+
+import com.lqr.optionitemview.OptionItemView;
+import com.gs.open.R;
+import com.gs.open.app.AppConst;
+import com.gs.open.ui.activity.MainActivity;
+import com.gs.open.ui.activity.ScanActivity;
+import com.gs.open.ui.base.BaseFragment;
+import com.gs.open.ui.presenter.DiscoveryFgPresenter;
+import com.gs.open.ui.view.IDiscoveryFgView;
+
+import butterknife.BindView;
+
+/**
+ * @创建者 CSDN_LQR
+ * @描述 发现界面
+ */
+public class DiscoveryFragment extends BaseFragment<IDiscoveryFgView, DiscoveryFgPresenter> implements IDiscoveryFgView {
+
+    @BindView(R.id.oivScan)
+    OptionItemView mOivScan;
+    @BindView(R.id.oivShop)
+    OptionItemView mOivShop;
+    @BindView(R.id.oivGame)
+    OptionItemView mOivGame;
+
+    @Override
+    public void initListener() {
+        mOivScan.setOnClickListener(v -> ((MainActivity) getActivity()).jumpToActivity(ScanActivity.class));
+        mOivShop.setOnClickListener(v -> ((MainActivity) getActivity()).jumpToWebViewActivity(AppConst.WeChatUrl.JD));
+        mOivGame.setOnClickListener(v -> ((MainActivity) getActivity()).jumpToWebViewActivity(AppConst.WeChatUrl.GAME));
+    }
+
+    @Override
+    protected DiscoveryFgPresenter createPresenter() {
+        return new DiscoveryFgPresenter((MainActivity) getActivity());
+    }
+
+    @Override
+    protected int provideContentViewId() {
+        return R.layout.fragment_discovery;
+    }
+}
