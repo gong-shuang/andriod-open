@@ -571,19 +571,19 @@ public class SessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> {
         messageUI.setConversationType((message.getReceiver() == null && message.getGroup() != null)?
                 Conversation.ConversationType.GROUP :
                 Conversation.ConversationType.PRIVATE);
-        if(message.getReceiver() !=null && mSessionId.equals(message.getSender().getId()) &&
-                Account.getUserId().equals(message.getReceiver().getId())){
-            //个人接受
-            messageUI.setMessageDirection(Message.MessageDirection.RECEIVE);
-            messageUI.setReceivedStatus( new Message.ReceivedStatus(1) );
-            messageUI.setReceivedTime(message.getCreateAt().getTime());
-        }else if(message.getReceiver() !=null &&
+        if(message.getReceiver() !=null &&
                 message.getReceiver().getId().equals(mSessionId) &&
                 (Account.getUserId().equals(message.getSender().getId()) )){
             //个人发送
             messageUI.setMessageDirection(Message.MessageDirection.SEND);
             messageUI.setSentStatus( Message.SentStatus.SENT );
             messageUI.setSentTime(message.getCreateAt().getTime());
+        }else if(message.getReceiver() !=null && mSessionId.equals(message.getSender().getId()) &&
+                Account.getUserId().equals(message.getReceiver().getId())){
+            //个人接受
+            messageUI.setMessageDirection(Message.MessageDirection.RECEIVE);
+            messageUI.setReceivedStatus( new Message.ReceivedStatus(1) );
+            messageUI.setReceivedTime(message.getCreateAt().getTime());
         }else if(message.getGroup() != null &&
                 message.getGroup().getId().equals(mSessionId) &&
                 Account.getUserId().equals(message.getSender().getId())){
