@@ -40,11 +40,8 @@ public class MessageRepository extends BaseDbRepository<Message>
 
         Log.d("111", "receiverId:"+receiverId +"currentId:"+currentId );
 
-        // 接受个人 (sender_id == receiverId and group_id == null and message_receiver_id == currentId)
-        // 接受群 or (sender_id == receiverId) and group_id != null
+        // 接受 (sender_id == receiverId and group_id == null and message_receiver_id == currentId)
         // 发送 or (sender_id == currentId) and  message_receiver_id == receiverId
-        //(sender_id == receiverId and group_id == null)
-        // or (receiver_id==receiverId)
         SQLite.select()
                 .from(Message.class)
                 .where(OperatorGroup.clause()

@@ -8,6 +8,11 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.gs.factory.common.data.DataSource;
+import com.gs.factory.data.helper.GroupHelper;
+import com.gs.factory.model.api.group.GroupCreateModel;
+import com.gs.factory.model.card.GroupCard;
+import com.gs.factory.persistence.Account;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRHeaderAndFooterAdapter;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;
@@ -27,8 +32,13 @@ import com.gs.open.util.LogUtils;
 import com.gs.open.util.SortUtils;
 import com.gs.open.util.UIUtils;
 
+import net.qiujuer.genius.kit.handler.Run;
+import net.qiujuer.genius.kit.handler.runable.Action;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -63,8 +73,10 @@ public class CreateGroupAtPresenter extends BasePresenter<ICreateGroupAtView> {
                         mData.addAll(friends);
                         //整理排序
                         SortUtils.sortContacts(mData);
+                        LogUtils.d("mAdapter:" + mAdapter);
                         if (mAdapter != null)
                             mAdapter.notifyDataSetChanged();
+                        LogUtils.d("mAdapter1:" + mAdapter);
                     }
                 }, this::loadError);
     }
@@ -90,12 +102,18 @@ public class CreateGroupAtPresenter extends BasePresenter<ICreateGroupAtView> {
                         cb.setChecked(mSelectedData.contains(item) ? true : false);
                     }
 
+                    if(item.getDisplayNameSpelling()  == null )
+                        return;
+
                     String str = "";
                     //得到当前字母
                     String currentLetter = item.getDisplayNameSpelling().charAt(0) + "";
                     if (position == 0) {
                         str = currentLetter;
                     } else {
+                        if(mData.get(position - 1).getDisplayNameSpelling() == null )
+                            return;
+
                         //得到上一个字母
                         String preLetter = mData.get(position - 1).getDisplayNameSpelling().charAt(0) + "";
                         //如果和上一个字母的首字母不同则显示字母栏
@@ -181,11 +199,11 @@ public class CreateGroupAtPresenter extends BasePresenter<ICreateGroupAtView> {
     }
 
     public void createGroup() {
-        mSelectedData.add(0, DBManager.getInstance().getFriendById(UserCache.getId()));
-        int size = mSelectedData.size();
-        if (size == 0)
+        if (mSelectedData.size() == 0)
             return;
 
+        mSelectedData.add(0, DBManager.getInstance().getFriendById(Account.getUserId()));
+        int size = mSelectedData.size();
         List<String> selectedIds = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             Friend friend = mSelectedData.get(i);
@@ -204,25 +222,59 @@ public class CreateGroupAtPresenter extends BasePresenter<ICreateGroupAtView> {
         }
         mGroupName = mGroupName.substring(0, mGroupName.length() - 1);
 
-        mContext.showWaitingDialog(UIUtils.getString(R.string.please_wait));
-        ApiRetrofit.getInstance().createGroup(mGroupName, selectedIds)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(createGroupResponse -> {
-                    mContext.hideWaitingDialog();
-                    if (createGroupResponse.getCode() == 200) {
-                        UIUtils.showToast(UIUtils.getString(R.string.create_group_success));
-                        CreateGroupResponse.ResultEntity resultEntity = createGroupResponse.getResult();
-                        DBManager.getInstance().saveOrUpdateGroup(new Groups(resultEntity.getId(), mGroupName, null, String.valueOf(0)));
+//        mContext.showWaitingDialog(UIUtils.getString(R.string.please_wait));
+
+//        ApiRetrofit.getInstance().createGroup(mGroupName, selectedIds)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(createGroupResponse -> {
+//                    mContext.hideWaitingDialog();
+//                    if (createGroupResponse.getCode() == 200) {
+//                        UIUtils.showToast(UIUtils.getString(R.string.create_group_success));
+//                        CreateGroupResponse.ResultEntity resultEntity = createGroupResponse.getResult();
+//                        DBManager.getInstance().saveOrUpdateGroup(new Groups(resultEntity.getId(), mGroupName, null, String.valueOf(0)));
+//                        Intent intent = new Intent(mContext, SessionActivity.class);
+//                        intent.putExtra("sessionId", resultEntity.getId());
+//                        intent.putExtra("sessionType", SessionActivity.SESSION_TYPE_GROUP);
+//                        mContext.jumpToActivity(intent);
+//                        mContext.finish();
+//                    } else {
+//                        UIUtils.showToast(UIUtils.getString(R.string.create_group_fail));
+//                    }
+//                }, this::loadError);
+
+        Set<String> users = new HashSet<>();
+        for(String id: selectedIds){
+            users.add(id);
+        }
+
+        // 进行网络请求
+        GroupCreateModel model = new GroupCreateModel(mGroupName, mGroupName, Account.getUser().getPortrait(), users);
+        GroupHelper.create(model, new DataSource.Callback<GroupCard>() {
+            @Override
+            public void onDataNotAvailable(int strRes) {
+                // 失败情况
+                UIUtils.showToastSafely(mContext.getResources().getString(strRes));
+            }
+
+            @Override
+            public void onDataLoaded(GroupCard groupCard) {
+                // 成功
+                Run.onUiAsync(new Action() {
+                    @Override
+                    public void call() {
+                        DBManager.getInstance().saveOrUpdateGroup(new Groups(groupCard.getId(), groupCard.getName(), null,
+                                groupCard.getOwnerId().equals(Account.getUserId())?"0":"1"));
                         Intent intent = new Intent(mContext, SessionActivity.class);
-                        intent.putExtra("sessionId", resultEntity.getId());
+                        intent.putExtra("sessionId", groupCard.getId());
                         intent.putExtra("sessionType", SessionActivity.SESSION_TYPE_GROUP);
                         mContext.jumpToActivity(intent);
                         mContext.finish();
-                    } else {
-                        UIUtils.showToast(UIUtils.getString(R.string.create_group_fail));
                     }
-                }, this::loadError);
+                });
+
+            }
+        });
     }
 
     private void loadError(Throwable throwable) {

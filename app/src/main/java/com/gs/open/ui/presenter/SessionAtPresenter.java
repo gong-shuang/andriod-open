@@ -561,6 +561,7 @@ public class SessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> {
     }
 
 
+    //个人 或者 群
     public Message toMessageUI(com.gs.factory.model.db.Message message){
         Message messageUI = new Message();
         if(message.getType()==com.gs.factory.model.db.Message.TYPE_STR){
@@ -570,18 +571,34 @@ public class SessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> {
         messageUI.setConversationType((message.getReceiver() == null && message.getGroup() != null)?
                 Conversation.ConversationType.GROUP :
                 Conversation.ConversationType.PRIVATE);
-        if(mSessionId.equals(message.getSender().getId()) &&
+        if(message.getReceiver() !=null && mSessionId.equals(message.getSender().getId()) &&
                 Account.getUserId().equals(message.getReceiver().getId())){
-            //接受
+            //个人接受
             messageUI.setMessageDirection(Message.MessageDirection.RECEIVE);
             messageUI.setReceivedStatus( new Message.ReceivedStatus(1) );
             messageUI.setReceivedTime(message.getCreateAt().getTime());
-        }else if(mSessionId.equals(message.getReceiver().getId()) &&
+        }else if(message.getReceiver() !=null &&
+                message.getReceiver().getId().equals(mSessionId) &&
                 (Account.getUserId().equals(message.getSender().getId()) )){
-            //发送
+            //个人发送
             messageUI.setMessageDirection(Message.MessageDirection.SEND);
             messageUI.setSentStatus( Message.SentStatus.SENT );
             messageUI.setSentTime(message.getCreateAt().getTime());
+        }else if(message.getGroup() != null &&
+                message.getGroup().getId().equals(mSessionId) &&
+                Account.getUserId().equals(message.getSender().getId())){
+            //群 本人发送到群中
+            messageUI.setMessageDirection(Message.MessageDirection.SEND);
+            messageUI.setSentStatus( Message.SentStatus.SENT );
+            messageUI.setSentTime(message.getCreateAt().getTime());
+        }else if(message.getGroup() != null &&
+                message.getGroup().getId().equals(mSessionId) &&
+                !Account.getUserId().equals(message.getSender().getId())){
+            //群 他人发送到群中
+            messageUI.setMessageDirection(Message.MessageDirection.RECEIVE);
+            messageUI.setReceivedStatus( new Message.ReceivedStatus(1) );
+            messageUI.setReceivedTime(message.getCreateAt().getTime());
+
         }else{
             return null;
         }

@@ -17,6 +17,7 @@ import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.IMeFgView;
 import com.gs.open.util.LogUtils;
+import com.gs.open.util.PinyinUtils;
 import com.gs.open.util.RongGenerate;
 import com.gs.open.util.UIUtils;
 
@@ -49,8 +50,15 @@ public class MeFgPresenter extends BasePresenter<IMeFgView> {
                 user.setPortrait(portrait);
             }
             mUserInfo = new UserInfo(user.getId(),user.getName(),user.getPortrait()==null ? null: Uri.parse(user.getPortrait()));
-            DBManager.getInstance().saveOrUpdateFriend(new Friend(mUserInfo.getUserId(), mUserInfo.getName(),
-                    mUserInfo.getPortraitUri() == null ?  null : mUserInfo.getPortraitUri().toString()));
+            Friend friend = new Friend(
+                    user.getId(),
+                    user.getName(),
+                    user.getPortrait(),
+                    TextUtils.isEmpty(user.getAlias()) ? user.getName() : user.getAlias(),
+                    null, user.getPhone(), null, null,
+                    PinyinUtils.getPinyin(user.getName()),
+                    PinyinUtils.getPinyin(TextUtils.isEmpty(user.getAlias()) ? user.getName() : user.getAlias()));
+            DBManager.getInstance().saveOrUpdateFriend(friend);
         }
         fillView();
 

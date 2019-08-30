@@ -1,0 +1,7 @@
+ext {
+    // 版本配置
+    version = [
+        versionCode: 2,
+        versionName: "0.1.1",
+    ]
+}
