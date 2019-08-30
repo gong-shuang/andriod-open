@@ -52,7 +52,7 @@ public class MyInfoAtPresenter extends BasePresenter<IMyInfoAtView> {
         if (mUserInfo != null) {
             Glide.with(mContext).load(mUserInfo.getPortraitUri()).centerCrop().into(getView().getIvHeader());
             getView().getOivName().setRightText(mUserInfo.getName());
-            getView().getOivAccount().setRightText(mUserInfo.getUserId());
+            getView().getOivAccount().setRightText(Account.getUser().getPhone());
             getView().getOivSignature().setRightText(Account.getUser().getDesc());
         }
     }
