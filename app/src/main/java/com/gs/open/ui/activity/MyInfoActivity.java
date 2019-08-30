@@ -231,6 +231,7 @@ public class MyInfoActivity extends BaseActivity<IMyInfoAtView, MyInfoAtPresente
         return mOivName;
     }
 
+    //手机号
     @Override
     public OptionItemView getOivAccount() {
         return mOivAccount;

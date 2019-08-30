@@ -28,7 +28,7 @@ public class AddFriendActivity extends BaseActivity<IAddFriendAtView, AddFriendA
     @Override
     public void initView() {
         setToolbarTitle(UIUtils.getString(R.string.add_friend));
-        mTvAccount.setText(Account.getUserId() + "");
+        mTvAccount.setText(Account.getUser().getPhone() + "");
     }
 
     @Override

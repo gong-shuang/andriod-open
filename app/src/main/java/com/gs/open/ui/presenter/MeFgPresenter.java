@@ -99,7 +99,7 @@ public class MeFgPresenter extends BasePresenter<IMeFgView> {
     public void fillView() {
         if (mUserInfo != null) {
             Glide.with(mContext).load(mUserInfo.getPortraitUri()).centerCrop().into(getView().getIvHeader());
-            getView().getTvAccount().setText(UIUtils.getString(R.string.my_chat_account, mUserInfo.getUserId()));
+            getView().getTvAccount().setText(Account.getUser().getPhone());
             getView().getTvName().setText(mUserInfo.getName());
         }
     }

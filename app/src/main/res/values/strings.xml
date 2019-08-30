@@ -76,7 +76,7 @@
     <string name="game">游戏</string>
 
     <!--我-->
-    <string name="my_chat_account">微信号:%1$s</string>
+    <string name="my_chat_account">手机号:%1$s</string>
     <string name="album">相册</string>
     <string name="collection">收藏</string>
     <string name="wallet">钱包</string>
@@ -91,7 +91,7 @@
 
     <!--我的个人信息-->
     <string name="header_pic">头像</string>
-    <string name="wechat_account">微信号</string>
+    <string name="wechat_account">手机号</string>
     <string name="qr_code_card">二维码名片</string>
     <string name="my_location">我的地址</string>
     <string name="gender">性别</string>
@@ -111,7 +111,7 @@
     <string name="help_feedback">帮助与反馈</string>
 
     <!--添加朋友-->
-    <string name="my_wechat_account">我的微信号:</string>
+    <string name="my_wechat_account">我的手机号:</string>
     <string name="radar_add_friend">雷达加朋友</string>
     <string name="add_near_friend">添加身边的朋友</string>
     <string name="create_group_face_to_face">面对面建群</string>
