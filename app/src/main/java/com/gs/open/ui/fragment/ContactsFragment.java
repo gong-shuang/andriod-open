@@ -72,6 +72,7 @@ public class ContactsFragment extends BaseFragment<IContactsFgView, ContactsFgPr
         });
         //群聊的监听
         mHeaderView.findViewById(R.id.llGroup).setOnClickListener(v -> ((MainActivity) getActivity()).jumpToActivity(GroupListActivity.class));
+        //字母
         mQib.setOnLetterUpdateListener(new QuickIndexBar.OnLetterUpdateListener() {
             @Override
             public void onLetterUpdate(String letter) {

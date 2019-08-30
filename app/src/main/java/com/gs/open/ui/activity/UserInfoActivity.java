@@ -103,7 +103,7 @@ public class UserInfoActivity extends BaseActivity {
     public void initData() {
         mFriend = DBManager.getInstance().getFriendById(mUserInfo.getUserId());
         Glide.with(this).load(DBManager.getInstance().getPortraitUri(mUserInfo)).centerCrop().into(mIvHeader);
-        mTvAccount.setText(UIUtils.getString(R.string.my_chat_account, mUserInfo.getUserId()));
+        mTvAccount.setText(UIUtils.getString(R.string.my_chat_account, Account.getUser().getPhone()));
         mTvName.setText(mUserInfo.getName());
 
         if (mFriend == null) {//陌生人

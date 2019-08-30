@@ -1,5 +1,7 @@
 package com.gs.factory.data.helper;
 
+import android.text.TextUtils;
+
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import com.gs.factory.Factory;
@@ -15,6 +17,7 @@ import com.gs.factory.net.Network;
 import com.gs.factory.net.RemoteService;
 import com.gs.factory.persistence.Account;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -131,6 +134,48 @@ public class UserHelper {
                             // CollectionUtil.toArray(cards, UserCard.class);
 
                             Factory.getUserCenter().dispatch(cards1);
+
+                        } else {
+                            Factory.decodeRspCode(rspModel, null);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<RspModel<List<UserCard>>> call, Throwable t) {
+                        // nothing
+                    }
+                });
+    }
+
+    // 获取关注我的人的列表
+    public static void refreshFollowers(final DataSource.SucceedCallback<List<User>> callback) {
+        RemoteService service = Network.remote();
+        service.userFollowers()
+                .enqueue(new Callback<RspModel<List<UserCard>>>() {
+                    @Override
+                    public void onResponse(Call<RspModel<List<UserCard>>> call, Response<RspModel<List<UserCard>>> response) {
+                        RspModel<List<UserCard>> rspModel = response.body();
+                        if (rspModel.success()) {
+                            // 拿到集合
+                            List<UserCard> cards = rspModel.getResult();
+                            if (cards == null || cards.size() == 0)
+                                return;
+
+       //                     UserCard[] cards1 = cards.toArray(new UserCard[0]);
+                            // CollectionUtil.toArray(cards, UserCard.class);
+
+                       //     Factory.getUserCenter().dispatch(cards1);  不能给数据库处理。
+
+                            List<User> users = new ArrayList<>();
+                            for (UserCard card : cards) {
+                                // 进行过滤操作
+                                if (card == null || TextUtils.isEmpty(card.getId()))
+                                    continue;
+                                // 添加操作
+                                users.add(card.build());
+                            }
+                            //本地处理：
+                            callback.onDataLoaded(users);
 
                         } else {
                             Factory.decodeRspCode(rspModel, null);

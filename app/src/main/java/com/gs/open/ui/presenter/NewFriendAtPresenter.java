@@ -6,7 +6,14 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.gs.factory.common.data.DataSource;
+import com.gs.factory.data.helper.UserHelper;
+import com.gs.factory.model.card.UserCard;
+import com.gs.factory.model.db.User;
+import com.gs.factory.persistence.Account;
 import com.gs.open.temp.UserInfo;
+import com.gs.open.util.PinyinUtils;
+import com.gs.open.util.SortUtils;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;
 import com.gs.open.R;
@@ -26,6 +33,9 @@ import com.gs.open.ui.view.INewFriendAtView;
 import com.gs.open.util.LogUtils;
 import com.gs.open.util.NetUtils;
 import com.gs.open.util.UIUtils;
+
+import net.qiujuer.genius.kit.handler.Run;
+import net.qiujuer.genius.kit.handler.runable.Action;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,36 +67,88 @@ public class NewFriendAtPresenter extends BasePresenter<INewFriendAtView> {
     }
 
     private void loadData() {
-        ApiRetrofit.getInstance().getAllUserRelationship()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(userRelationshipResponse -> {
-                    if (userRelationshipResponse.getCode() == 200) {
-                        List<UserRelationshipResponse.ResultEntity> result = userRelationshipResponse.getResult();
+//        ApiRetrofit.getInstance().getAllUserRelationship()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(userRelationshipResponse -> {
+//                    if (userRelationshipResponse.getCode() == 200) {
+//                        List<UserRelationshipResponse.ResultEntity> result = userRelationshipResponse.getResult();
+//
+//                        if (result != null && result.size() > 0) {
+//                            for (int i = 0; i < result.size(); i++) {
+//                                UserRelationshipResponse.ResultEntity re = result.get(i);
+//                                if (re.getStatus() == 10) {//是我发起的添加好友请求
+//                                    result.remove(re);
+//                                    i--;
+//                                }
+//                            }
+//                        }
+//
+//                        if (result != null && result.size() > 0) {
+//                            getView().getLlHasNewFriend().setVisibility(View.VISIBLE);
+//                            mData.clear();
+//                            mData.addAll(result);
+//                            if (mAdapter != null)
+//                                mAdapter.notifyDataSetChangedWrapper();
+//                        } else {
+//                            getView().getLlNoNewFriend().setVisibility(View.VISIBLE);
+//                        }
+//                    } else {
+//                        Observable.error(new ServerException(UIUtils.getString(R.string.load_error)));
+//                    }
+//                }, this::loadError);
+        // 获取关注我的人的列表，
+        // 加载网络数据
+        UserHelper.refreshFollowers(new DataSource.SucceedCallback<List<User>>() {
+            @Override
+            public void onDataLoaded(List<User> users) {
+                LogUtils.d("loadContacts(), thread: " + Thread.currentThread().getName());
+                //这段代码与联系人的重复了，后面会一起处理。
+                if (users != null && users.size() > 0) {
+                    List<UserRelationshipResponse.ResultEntity> ResultList = new ArrayList<>();
+                    for(User user: users){
+                        UserRelationshipResponse.ResultEntity.UserEntity userEntity = new UserRelationshipResponse.ResultEntity.UserEntity();
+                        userEntity.setId(user.getId());
+                        userEntity.setNickname(user.getName());
+                        userEntity.setPortraitUri(user.getPortrait());
+                        UserRelationshipResponse.ResultEntity Result = new UserRelationshipResponse.ResultEntity(
+                                user.getName(),"你好！",
+                                DBManager.getInstance().getUserInfo(user.getId()) == null ? 11 : 20,
+                                user.getModifyAt().toString(),userEntity);
 
-                        if (result != null && result.size() > 0) {
-                            for (int i = 0; i < result.size(); i++) {
-                                UserRelationshipResponse.ResultEntity re = result.get(i);
-                                if (re.getStatus() == 10) {//是我发起的添加好友请求
-                                    result.remove(re);
-                                    i--;
-                                }
-                            }
-                        }
+                        ResultList.add(Result);
+                    }
 
-                        if (result != null && result.size() > 0) {
-                            getView().getLlHasNewFriend().setVisibility(View.VISIBLE);
-                            mData.clear();
-                            mData.addAll(result);
+                    if(getView() == null)
+                        return;
+
+                    getView().getLlHasNewFriend().setVisibility(View.VISIBLE);
+                    mData.clear();
+                    mData.addAll(ResultList);
+
+
+                    Run.onUiAsync(new Action() {
+                        @Override
+                        public void call() {
+                            // 这里是主线程运行时
                             if (mAdapter != null)
-                                mAdapter.notifyDataSetChangedWrapper();
-                        } else {
+                                mAdapter.notifyDataSetChanged();
+                        }
+                    });
+                }else {
+                    Run.onUiAsync(new Action() {
+                        @Override
+                        public void call() {
+                            // 这里是主线程运行时
+                            if(getView() == null)
+                                return;
                             getView().getLlNoNewFriend().setVisibility(View.VISIBLE);
                         }
-                    } else {
-                        Observable.error(new ServerException(UIUtils.getString(R.string.load_error)));
-                    }
-                }, this::loadError);
+                    });
+
+                }
+            }
+        });
     }
 
     private void setAdapter() {
