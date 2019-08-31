@@ -14,10 +14,12 @@ import com.gs.factory.model.api.group.GroupMemberAddModel;
 import com.gs.factory.model.api.group.GroupMemberDelModel;
 import com.gs.factory.model.card.GroupCard;
 import com.gs.factory.model.card.GroupMemberCard;
+import com.gs.factory.model.card.GroupResponseCard;
 import com.gs.factory.persistence.Account;
 import com.gs.open.db.model.Friend;
 import com.gs.open.temp.Conversation;
 import com.gs.open.temp.UserInfo;
+import com.gs.open.ui.activity.MainActivity;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;
 import com.gs.open.R;
@@ -406,6 +408,7 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
         LogUtils.sf(throwable.getLocalizedMessage());
     }
 
+    //退出该群
     public void quit() {
         if (mGroups == null)
             return;
@@ -418,45 +421,100 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
             quitGroupResponseObservable = ApiRetrofit.getInstance().quitGroup(mSessionId);
         }
         mContext.showMaterialDialog(null, tip, UIUtils.getString(R.string.sure), UIUtils.getString(R.string.cancel)
-                , v -> quitGroupResponseObservable
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(quitGroupResponse -> {
-                            mContext.hideMaterialDialog();
-                            if (quitGroupResponse != null && quitGroupResponse.getCode() == 200) {
-//                                RongIMClient.getInstance().getConversation(mConversationType, mSessionId, new RongIMClient.ResultCallback<Conversation>() {
-//                                    @Override
-//                                    public void onSuccess(Conversation conversation) {
-//                                        RongIMClient.getInstance().clearMessages(Conversation.ConversationType.GROUP, mSessionId, new RongIMClient.ResultCallback<Boolean>() {
-//                                            @Override
-//                                            public void onSuccess(Boolean aBoolean) {
-//                                                RongIMClient.getInstance().removeConversation(mConversationType, mSessionId, null);
-//                                            }
-//
-//                                            @Override
-//                                            public void onError(RongIMClient.ErrorCode errorCode) {
-//
-//                                            }
-//                                        });
-//                                    }
-//
-//                                    @Override
-//                                    public void onError(RongIMClient.ErrorCode errorCode) {
-//
-//                                    }
-//                                });
-                                DBManager.getInstance().deleteGroupMembersByGroupId(mSessionId);
-                                DBManager.getInstance().deleteGroupsById(mSessionId);
-                                BroadcastManager.getInstance(mContext).sendBroadcast(AppConst.UPDATE_CONVERSATIONS);
-                                BroadcastManager.getInstance(mContext).sendBroadcast(AppConst.UPDATE_GROUP);
-                                BroadcastManager.getInstance(mContext).sendBroadcast(AppConst.CLOSE_CURRENT_SESSION);
-                                mContext.finish();
-                            } else {
-                                UIUtils.showToast(UIUtils.getString(R.string.exit_group_fail));
-                            }
-                        }, this::quitError)
-
+//                , v -> quitGroupResponseObservable
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe(quitGroupResponse -> {
+//                            mContext.hideMaterialDialog();
+//                            if (quitGroupResponse != null && quitGroupResponse.getCode() == 200) {
+////                                RongIMClient.getInstance().getConversation(mConversationType, mSessionId, new RongIMClient.ResultCallback<Conversation>() {
+////                                    @Override
+////                                    public void onSuccess(Conversation conversation) {
+////                                        RongIMClient.getInstance().clearMessages(Conversation.ConversationType.GROUP, mSessionId, new RongIMClient.ResultCallback<Boolean>() {
+////                                            @Override
+////                                            public void onSuccess(Boolean aBoolean) {
+////                                                RongIMClient.getInstance().removeConversation(mConversationType, mSessionId, null);
+////                                            }
+////
+////                                            @Override
+////                                            public void onError(RongIMClient.ErrorCode errorCode) {
+////
+////                                            }
+////                                        });
+////                                    }
+////
+////                                    @Override
+////                                    public void onError(RongIMClient.ErrorCode errorCode) {
+////
+////                                    }
+////                                });
+//                                DBManager.getInstance().deleteGroupMembersByGroupId(mSessionId);
+//                                DBManager.getInstance().deleteGroupsById(mSessionId);
+//                                BroadcastManager.getInstance(mContext).sendBroadcast(AppConst.UPDATE_CONVERSATIONS);
+//                                BroadcastManager.getInstance(mContext).sendBroadcast(AppConst.UPDATE_GROUP);
+//                                BroadcastManager.getInstance(mContext).sendBroadcast(AppConst.CLOSE_CURRENT_SESSION);
+//                                mContext.finish();
+//                            } else {
+//                                UIUtils.showToast(UIUtils.getString(R.string.exit_group_fail));
+//                            }
+//                        }, this::quitError)
+                , v ->quitGroupSendRequest()
                 , v -> mContext.hideMaterialDialog());
+    }
+
+    //发送网络请求
+    void quitGroupSendRequest(){
+        mContext.hideMaterialDialog();
+
+        if(mConversationType == Conversation.ConversationType.PRIVATE)
+            return;
+
+        // 进行网络请求
+        GroupHelper.quitGroup(mSessionId, new DataSource.Callback<GroupResponseCard>() {
+                    @Override
+                    public void onDataNotAvailable(int strRes) {
+                        Run.onUiAsync(new Action() {
+                            @Override
+                            public void call() {
+                                UIUtils.showToast(strRes);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onDataLoaded(GroupResponseCard groupResponseCard) {
+                        //退出群的信息
+                        //不用更新本地保存的组信息
+                        //也不用更新UI
+                        //直接退到主界面
+                        mContext.jumpToActivityAndClearTask(MainActivity.class);
+                        mContext.finish();
+                    }
+                }
+//                new DataSource.Callback<List<GroupMemberCard>>() {
+//            @Override
+//            public void onDataNotAvailable(int strRes) {
+//                Run.onUiAsync(new Action() {
+//                    @Override
+//                    public void call() {
+//                        UIUtils.showToast(strRes);
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void onDataLoaded(List<GroupMemberCard> groupMemberCards) {
+//                //返回新添加的成员
+//                //更新本地保存的组信息
+//                for(GroupMemberCard memberCard: groupMemberCards){
+//                    //保存到数据库
+//                    DBManager.getInstance().deleteGroupMembers(toGroupMember(memberCard));
+//                }
+//                //更新UI
+//                loadData();
+//            }
+//        }
+        );
     }
 
     private void quitError(Throwable throwable) {

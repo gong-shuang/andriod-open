@@ -18,4 +18,7 @@ public interface GroupCenter {
 
     // 群成员的处理
     void dispatchDel(GroupMemberCard... cards);
+
+    //退出群
+    public void dispatchQuitGroup(String groupId);
 }

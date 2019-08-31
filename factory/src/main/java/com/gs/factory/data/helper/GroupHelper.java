@@ -1,6 +1,7 @@
 package com.gs.factory.data.helper;
 
 import com.gs.factory.model.api.group.GroupMemberDelModel;
+import com.gs.factory.model.card.GroupResponseCard;
 import com.raizlabs.android.dbflow.sql.language.Join;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
@@ -158,6 +159,14 @@ public class GroupHelper {
                 .count();
     }
 
+    // 从本地获取一个群的成员
+    public static List<GroupMember> getMemberFromGroup(String id) {
+        return SQLite.select()
+                .from(GroupMember.class)
+                .where(GroupMember_Table.group_id.eq(id))
+                .queryList();
+    }
+
     // 从网络去刷新一个群的成员信息
     public static void refreshGroupMember(Group group) {
         RemoteService service = Network.remote();
@@ -254,6 +263,33 @@ public class GroupHelper {
 
                     @Override
                     public void onFailure(Call<RspModel<List<GroupMemberCard>>> call, Throwable t) {
+                        callback.onDataNotAvailable(R.string.data_network_error);
+                    }
+                });
+    }
+
+    // 网络请求进行退出群
+    public static void quitGroup(String groupId, final DataSource.Callback<GroupResponseCard> callback) {
+        RemoteService service = Network.remote();
+        service.groupQuit(groupId)
+                .enqueue(new Callback<RspModel<GroupResponseCard>>() {
+                    @Override
+                    public void onResponse(Call<RspModel<GroupResponseCard>> call, Response<RspModel<GroupResponseCard>> response) {
+                        RspModel<GroupResponseCard> rspModel = response.body();
+                        if (rspModel != null && rspModel.success()) {
+                            GroupResponseCard memberCards = rspModel.getResult();
+                            if (memberCards != null && memberCards.getGroupId() != null) {
+                                // 进行调度显示
+                                Factory.getGroupCenter().dispatchQuitGroup(memberCards.getGroupId());
+                                callback.onDataLoaded(memberCards);
+                            }
+                        } else {
+                            Factory.decodeRspCode(rspModel, null);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<RspModel<GroupResponseCard>> call, Throwable t) {
                         callback.onDataNotAvailable(R.string.data_network_error);
                     }
                 });

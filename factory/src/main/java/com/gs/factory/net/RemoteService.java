@@ -11,6 +11,7 @@ import com.gs.factory.model.api.message.MsgCreateModel;
 import com.gs.factory.model.api.user.UserUpdateModel;
 import com.gs.factory.model.card.GroupCard;
 import com.gs.factory.model.card.GroupMemberCard;
+import com.gs.factory.model.card.GroupResponseCard;
 import com.gs.factory.model.card.MessageCard;
 import com.gs.factory.model.card.UserCard;
 
@@ -115,4 +116,8 @@ public interface RemoteService {
     @POST("group/{groupId}/delete/member")
     Call<RspModel<List<GroupMemberCard>>> groupMemberDel(@Path("groupId") String groupId,
                                                          @Body GroupMemberDelModel model);
+
+    // 给群删除成员
+    @POST("group/quit/{groupId}")
+    Call<RspModel<GroupResponseCard>> groupQuit(@Path("groupId") String groupId);
 }

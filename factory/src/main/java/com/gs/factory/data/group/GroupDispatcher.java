@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import static com.gs.factory.data.helper.GroupHelper.getMemberFromGroup;
+
 /**
  * 群／群成员卡片中心的实现类
  * @author qiujuer Email:qiujuer@live.cn
@@ -52,6 +54,12 @@ public class GroupDispatcher implements GroupCenter {
         if (cards == null || cards.length == 0)
             return;
         executor.execute(new GroupMemberRspDelHandler(cards));
+    }
+
+
+    @Override
+    public void dispatchQuitGroup(String groupId) {
+        executor.execute(new GroupQuitRspHandler(groupId));
     }
 
     private class GroupMemberRspHandler implements Runnable {
@@ -101,6 +109,29 @@ public class GroupDispatcher implements GroupCenter {
             }
             if (members.size() > 0)
                 DbHelper.delete(GroupMember.class, members.toArray(new GroupMember[0]));
+        }
+    }
+
+    private class GroupQuitRspHandler implements Runnable {
+        private final String groupId;
+
+        GroupQuitRspHandler(String groupId) {
+            this.groupId = groupId;
+        }
+
+        @Override
+        public void run() {
+            List<GroupMember> members = getMemberFromGroup(groupId);
+            if (members.size() > 0) {
+                DbHelper.delete(GroupMember.class, members.toArray(new GroupMember[0]));
+            }
+
+            //同时删除组
+            List<Group> groups = new ArrayList<>();
+            Group group = GroupHelper.find(groupId);
+            groups.add(group);
+            if (groups.size() > 0)
+                DbHelper.delete(Group.class, groups.toArray(new Group[0]));
         }
     }
 
