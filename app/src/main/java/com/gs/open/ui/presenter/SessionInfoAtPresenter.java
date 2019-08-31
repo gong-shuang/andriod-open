@@ -11,6 +11,7 @@ import com.gs.factory.common.data.DataSource;
 import com.gs.factory.data.helper.GroupHelper;
 import com.gs.factory.model.api.group.GroupCreateModel;
 import com.gs.factory.model.api.group.GroupMemberAddModel;
+import com.gs.factory.model.api.group.GroupMemberDelModel;
 import com.gs.factory.model.card.GroupCard;
 import com.gs.factory.model.card.GroupMemberCard;
 import com.gs.factory.persistence.Account;
@@ -288,32 +289,66 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
     }
 
     public void deleteGroupMembers(ArrayList<String> selectedIds) {
-        mContext.showWaitingDialog(UIUtils.getString(R.string.please_wait));
-        ApiRetrofit.getInstance().deleGroupMember(mSessionId, selectedIds)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(deleteGroupMemberResponse -> {
-                    if (deleteGroupMemberResponse != null && deleteGroupMemberResponse.getCode() == 200) {
-                        LogUtils.sf("网络请求成功，开始删除：");
-                        for (int i = 0; i < mData.size(); i++) {
-                            GroupMember member = mData.get(i);
-                            if (selectedIds.contains(member.getUserId())) {
-                                LogUtils.sf("删除用户：" + member.getUserId());
-                                member.delete();
-                                mData.remove(i);
-                                i--;
-                            }
-                        }
-                        LogUtils.sf("删除结束");
-                        mContext.hideWaitingDialog();
-                        setAdapter();
-                        UIUtils.showToast(UIUtils.getString(R.string.del_member_success));
-                    } else {
-                        LogUtils.sf("网络请求失败");
-                        mContext.hideWaitingDialog();
-                        UIUtils.showToast(UIUtils.getString(R.string.del_member_fail));
+//        mContext.showWaitingDialog(UIUtils.getString(R.string.please_wait));
+//        ApiRetrofit.getInstance().deleGroupMember(mSessionId, selectedIds)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(deleteGroupMemberResponse -> {
+//                    if (deleteGroupMemberResponse != null && deleteGroupMemberResponse.getCode() == 200) {
+//                        LogUtils.sf("网络请求成功，开始删除：");
+//                        for (int i = 0; i < mData.size(); i++) {
+//                            GroupMember member = mData.get(i);
+//                            if (selectedIds.contains(member.getUserId())) {
+//                                LogUtils.sf("删除用户：" + member.getUserId());
+//                                member.delete();
+//                                mData.remove(i);
+//                                i--;
+//                            }
+//                        }
+//                        LogUtils.sf("删除结束");
+//                        mContext.hideWaitingDialog();
+//                        setAdapter();
+//                        UIUtils.showToast(UIUtils.getString(R.string.del_member_success));
+//                    } else {
+//                        LogUtils.sf("网络请求失败");
+//                        mContext.hideWaitingDialog();
+//                        UIUtils.showToast(UIUtils.getString(R.string.del_member_fail));
+//                    }
+//                }, this::delMembersError);
+
+        if(selectedIds.size() == 0 || mConversationType == Conversation.ConversationType.PRIVATE)
+            return;
+
+        Set<String> users = new HashSet<>();
+        for (String s: selectedIds){
+            users.add(s);
+        }
+
+        // 进行网络请求
+        GroupMemberDelModel model = new GroupMemberDelModel(users);
+        GroupHelper.delMembers(mSessionId, model, new DataSource.Callback<List<GroupMemberCard>>() {
+            @Override
+            public void onDataNotAvailable(int strRes) {
+                Run.onUiAsync(new Action() {
+                    @Override
+                    public void call() {
+                        UIUtils.showToast(strRes);
                     }
-                }, this::delMembersError);
+                });
+            }
+
+            @Override
+            public void onDataLoaded(List<GroupMemberCard> groupMemberCards) {
+                //返回新添加的成员
+                //更新本地保存的组信息
+                for(GroupMemberCard memberCard: groupMemberCards){
+                    //保存到数据库
+                    DBManager.getInstance().deleteGroupMembers(toGroupMember(memberCard));
+                }
+                //更新UI
+                loadData();
+            }
+        });
     }
 
     private void addMembersError(Throwable throwable) {

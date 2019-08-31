@@ -47,6 +47,13 @@ public class GroupDispatcher implements GroupCenter {
         executor.execute(new GroupMemberRspHandler(cards));
     }
 
+    @Override
+    public void dispatchDel(GroupMemberCard... cards) {
+        if (cards == null || cards.length == 0)
+            return;
+        executor.execute(new GroupMemberRspDelHandler(cards));
+    }
+
     private class GroupMemberRspHandler implements Runnable {
         private final GroupMemberCard[] cards;
 
@@ -69,6 +76,31 @@ public class GroupDispatcher implements GroupCenter {
             }
             if (members.size() > 0)
                 DbHelper.save(GroupMember.class, members.toArray(new GroupMember[0]));
+        }
+    }
+
+    private class GroupMemberRspDelHandler implements Runnable {
+        private final GroupMemberCard[] cards;
+
+        GroupMemberRspDelHandler(GroupMemberCard[] cards) {
+            this.cards = cards;
+        }
+
+        @Override
+        public void run() {
+            List<GroupMember> members = new ArrayList<>();
+            for (GroupMemberCard model : cards) {
+                // 成员对应的人的信息
+                User user = UserHelper.search(model.getUserId());
+                // 成员对应的群的信息
+                Group group = GroupHelper.find(model.getGroupId());
+                if (user != null && group != null) {
+                    GroupMember member = model.build(group, user);
+                    members.add(member);
+                }
+            }
+            if (members.size() > 0)
+                DbHelper.delete(GroupMember.class, members.toArray(new GroupMember[0]));
         }
     }
 

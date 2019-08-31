@@ -507,13 +507,20 @@ public class DBManager {
         DataSupport.deleteAll(GroupMember.class);
     }
 
+    public synchronized void deleteGroupMembers(GroupMember groupMember) {
+        if (groupMember != null) {
+            DataSupport.deleteAll(GroupMember.class, "groupid = ? and userid = ?", groupMember.getGroupId(), groupMember.getUserId());
+        }
+    }
+
     public synchronized void deleteGroupMembers(String groupId, List<String> kickedUserIds) {
         if (kickedUserIds != null && kickedUserIds.size() > 0) {
             for (String userId : kickedUserIds) {
                 DataSupport.deleteAll(GroupMember.class, "groupid = ? and userid = ?", groupId, userId);
             }
-            BroadcastManager.getInstance(UIUtils.getContext()).sendBroadcast(AppConst.UPDATE_GROUP_MEMBER, groupId);
-            BroadcastManager.getInstance(UIUtils.getContext()).sendBroadcast(AppConst.UPDATE_CONVERSATIONS);
+            //暂时先屏蔽
+//            BroadcastManager.getInstance(UIUtils.getContext()).sendBroadcast(AppConst.UPDATE_GROUP_MEMBER, groupId);
+//            BroadcastManager.getInstance(UIUtils.getContext()).sendBroadcast(AppConst.UPDATE_CONVERSATIONS);
         }
     }
 

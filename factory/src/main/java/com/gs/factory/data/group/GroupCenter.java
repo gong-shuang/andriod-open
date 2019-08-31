@@ -15,4 +15,7 @@ public interface GroupCenter {
 
     // 群成员的处理
     void dispatch(GroupMemberCard... cards);
+
+    // 群成员的处理
+    void dispatchDel(GroupMemberCard... cards);
 }

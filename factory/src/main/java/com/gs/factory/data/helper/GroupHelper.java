@@ -1,5 +1,6 @@
 package com.gs.factory.data.helper;
 
+import com.gs.factory.model.api.group.GroupMemberDelModel;
 import com.raizlabs.android.dbflow.sql.language.Join;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
@@ -217,6 +218,33 @@ public class GroupHelper {
                             if (memberCards != null && memberCards.size() > 0) {
                                 // 进行调度显示
                                 Factory.getGroupCenter().dispatch(memberCards.toArray(new GroupMemberCard[0]));
+                                callback.onDataLoaded(memberCards);
+                            }
+                        } else {
+                            Factory.decodeRspCode(rspModel, null);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<RspModel<List<GroupMemberCard>>> call, Throwable t) {
+                        callback.onDataNotAvailable(R.string.data_network_error);
+                    }
+                });
+    }
+
+    // 网络请求进行成员删除
+    public static void delMembers(String groupId, GroupMemberDelModel model, final DataSource.Callback<List<GroupMemberCard>> callback) {
+        RemoteService service = Network.remote();
+        service.groupMemberDel(groupId, model)
+                .enqueue(new Callback<RspModel<List<GroupMemberCard>>>() {
+                    @Override
+                    public void onResponse(Call<RspModel<List<GroupMemberCard>>> call, Response<RspModel<List<GroupMemberCard>>> response) {
+                        RspModel<List<GroupMemberCard>> rspModel = response.body();
+                        if (rspModel != null && rspModel.success()) {
+                            List<GroupMemberCard> memberCards = rspModel.getResult();
+                            if (memberCards != null && memberCards.size() > 0) {
+                                // 进行调度显示
+                                Factory.getGroupCenter().dispatchDel(memberCards.toArray(new GroupMemberCard[0]));
                                 callback.onDataLoaded(memberCards);
                             }
                         } else {
