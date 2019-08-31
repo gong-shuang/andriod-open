@@ -7,6 +7,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.gs.factory.common.data.DataSource;
+import com.gs.factory.data.helper.GroupHelper;
+import com.gs.factory.model.api.group.GroupCreateModel;
+import com.gs.factory.model.api.group.GroupMemberAddModel;
+import com.gs.factory.model.card.GroupCard;
+import com.gs.factory.model.card.GroupMemberCard;
+import com.gs.factory.persistence.Account;
+import com.gs.open.db.model.Friend;
 import com.gs.open.temp.Conversation;
 import com.gs.open.temp.UserInfo;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
@@ -32,8 +40,13 @@ import com.gs.open.util.PinyinUtils;
 import com.gs.open.util.UIUtils;
 import com.gs.open.widget.CustomDialog;
 
+import net.qiujuer.genius.kit.handler.Run;
+import net.qiujuer.genius.kit.handler.runable.Action;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 import rx.Observable;
@@ -131,12 +144,14 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
             };
             mAdapter.setOnItemClickListener((helper, parent, itemView, position) -> {
                 if (mIsManager && position >= mData.size() - 2) {//+和-
+                    //是群管理员
                     if (position == mData.size() - 2) {//+
                         addMember(mConversationType == Conversation.ConversationType.GROUP);
                     } else {//-
                         removeMember();
                     }
                 } else if (!mIsManager && position >= mData.size() - 1) {//+
+                    //不是群管理员
                     addMember(mConversationType == Conversation.ConversationType.GROUP);
                 } else {
                     seeUserInfo(DBManager.getInstance().getUserInfo(mData.get(position).getUserId()));
@@ -148,6 +163,7 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
         }
     }
 
+    //点击“+”号键，添加新的成员
     private void addMember(boolean isAddMember) {
 
         Intent intent = new Intent(mContext, CreateGroupActivity.class);
@@ -155,8 +171,13 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
         //如果是群组的话就把当前已经的群成员发过去
         if (isAddMember) {
             ArrayList<String> selectedTeamMemberAccounts = new ArrayList<>();
+            String id;
             for (int i = 0; i < mData.size(); i++) {
-                selectedTeamMemberAccounts.add(mData.get(i).getUserId());
+                id = mData.get(i).getUserId();
+                //最后两个是“+” “—”
+                if(id != null){
+                    selectedTeamMemberAccounts.add(id);
+                }
             }
             intent.putExtra("selectedMember", selectedTeamMemberAccounts);
         }
@@ -164,6 +185,7 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
         mContext.startActivityForResult(intent, SessionInfoActivity.REQ_ADD_MEMBERS);
     }
 
+    //点击“-”号键，删除成员
     private void removeMember() {
         Intent intent = new Intent(mContext, RemoveGroupMemberActivity.class);
         intent.putExtra("sessionId", mSessionId);
@@ -178,38 +200,91 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
 
     public void addGroupMember(ArrayList<String> selectedIds) {
         LogUtils.sf("addGroupMember : " + selectedIds);
-        mContext.showWaitingDialog(UIUtils.getString(R.string.please_wait));
-        ApiRetrofit.getInstance().addGroupMember(mSessionId, selectedIds)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(addGroupMemberResponse -> {
-                    if (addGroupMemberResponse != null && addGroupMemberResponse.getCode() == 200) {
-                        LogUtils.sf("网络请求成功，开始添加群成员：");
-                        Groups groups = DBManager.getInstance().getGroupsById(mSessionId);
-                        for (String groupMemberId : selectedIds) {
-                            UserInfo userInfo = DBManager.getInstance().getUserInfo(groupMemberId);
-                            if (userInfo != null) {
-                                GroupMember newMember = new GroupMember(mSessionId,
-                                        userInfo.getUserId(),
-                                        userInfo.getName(),
-                                        userInfo.getPortraitUri().toString(),
-                                        userInfo.getName(),
-                                        PinyinUtils.getPinyin(userInfo.getName()),
-                                        PinyinUtils.getPinyin(userInfo.getName()),
-                                        groups.getName(),
-                                        PinyinUtils.getPinyin(groups.getName()),
-                                        groups.getPortraitUri());
-                                DBManager.getInstance().saveOrUpdateGroupMember(newMember);
-                                LogUtils.sf("添加群成员成功");
-                            }
-                        }
-                        LogUtils.sf("添加群成员结束");
-                        mContext.hideWaitingDialog();
-                        loadData();
-                        LogUtils.sf("重新加载数据");
-                        UIUtils.showToast(UIUtils.getString(R.string.add_member_success));
+//        mContext.showWaitingDialog(UIUtils.getString(R.string.please_wait));
+//        ApiRetrofit.getInstance().addGroupMember(mSessionId, selectedIds)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(addGroupMemberResponse -> {
+//                    if (addGroupMemberResponse != null && addGroupMemberResponse.getCode() == 200) {
+//                        LogUtils.sf("网络请求成功，开始添加群成员：");
+//                        Groups groups = DBManager.getInstance().getGroupsById(mSessionId);
+//                        for (String groupMemberId : selectedIds) {
+//                            UserInfo userInfo = DBManager.getInstance().getUserInfo(groupMemberId);
+//                            if (userInfo != null) {
+//                                GroupMember newMember = new GroupMember(mSessionId,
+//                                        userInfo.getUserId(),
+//                                        userInfo.getName(),
+//                                        userInfo.getPortraitUri().toString(),
+//                                        userInfo.getName(),
+//                                        PinyinUtils.getPinyin(userInfo.getName()),
+//                                        PinyinUtils.getPinyin(userInfo.getName()),
+//                                        groups.getName(),
+//                                        PinyinUtils.getPinyin(groups.getName()),
+//                                        groups.getPortraitUri());
+//                                DBManager.getInstance().saveOrUpdateGroupMember(newMember);
+//                                LogUtils.sf("添加群成员成功");
+//                            }
+//                        }
+//                        LogUtils.sf("添加群成员结束");
+//                        mContext.hideWaitingDialog();
+//                        loadData();
+//                        LogUtils.sf("重新加载数据");
+//                        UIUtils.showToast(UIUtils.getString(R.string.add_member_success));
+//                    }
+//                }, this::addMembersError);
+
+        if(selectedIds.size() == 0 || mConversationType == Conversation.ConversationType.PRIVATE)
+            return;
+
+        Set<String> users = new HashSet<>();
+        for (String s: selectedIds){
+            users.add(s);
+        }
+
+        // 进行网络请求
+        GroupMemberAddModel model = new GroupMemberAddModel(users);
+        GroupHelper.addMembers(mSessionId, model, new DataSource.Callback<List<GroupMemberCard>>() {
+            @Override
+            public void onDataNotAvailable(int strRes) {
+                Run.onUiAsync(new Action() {
+                    @Override
+                    public void call() {
+                        UIUtils.showToast(strRes);
                     }
-                }, this::addMembersError);
+                });
+            }
+
+            @Override
+            public void onDataLoaded(List<GroupMemberCard> groupMemberCards) {
+                //返回新添加的成员
+                //更新本地保存的组信息
+                for(GroupMemberCard memberCard: groupMemberCards){
+                    //保存到数据库
+                    DBManager.getInstance().saveOrUpdateGroupMember(toGroupMember(memberCard));
+                }
+                //更新UI
+                loadData();
+            }
+        });
+    }
+
+    //转化为GroupMember格式
+    private GroupMember toGroupMember(GroupMemberCard member){
+        Groups groups =  DBManager.getInstance().getGroupsById(member.getGroupId());
+        Friend friend =  DBManager.getInstance().getFriendById(member.getUserId());
+        if(groups == null || friend == null){
+            LogUtils.e("groups == null || friend == null");
+            return null;
+        }
+        GroupMember groupMember = new GroupMember(friend.getUserId(), friend.getName(), friend.getPortraitUri());
+        groupMember.setNameSpelling(PinyinUtils.getPinyin(friend.getName() == null ? "null" : friend.getName()));
+        groupMember.setDisplayName(member.getAlias());
+        groupMember.setDisplayNameSpelling(PinyinUtils.getPinyin(member.getAlias() == null ? "null" : member.getAlias()));
+        groupMember.setGroupId(member.getGroupId());
+        groupMember.setGroupName(groups.getName());
+        groupMember.setGroupNameSpelling(PinyinUtils.getPinyin(groups.getName() == null ? "null" : groups.getName()));
+        groupMember.setGroupPortrait(groups.getPortraitUri());
+        return groupMember;
     }
 
     public void deleteGroupMembers(ArrayList<String> selectedIds) {

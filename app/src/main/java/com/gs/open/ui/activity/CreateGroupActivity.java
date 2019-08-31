@@ -27,7 +27,7 @@ import butterknife.BindView;
  */
 public class CreateGroupActivity extends BaseActivity<ICreateGroupAtView, CreateGroupAtPresenter> implements ICreateGroupAtView {
 
-    public ArrayList<String> mSelectedTeamMemberAccounts;
+    public ArrayList<String> mSelectedTeamMemberAccounts;  //已经是群成员的人的id ，由上个activity传过来的。
 
     @BindView(R.id.btnToolbarSend)
     Button mBtnToolbarSend;
@@ -60,11 +60,12 @@ public class CreateGroupActivity extends BaseActivity<ICreateGroupAtView, Create
 
     @Override
     public void initData() {
-        mPresenter.loadContacts();
+        mPresenter.loadContacts(mSelectedTeamMemberAccounts);
     }
 
     @Override
     public void initListener() {
+        //创建群的“确定”按钮
         mBtnToolbarSend.setOnClickListener(v -> {
             if (mSelectedTeamMemberAccounts == null) {
                 mPresenter.createGroup();
@@ -73,7 +74,9 @@ public class CreateGroupActivity extends BaseActivity<ICreateGroupAtView, Create
                 mPresenter.addGroupMembers();
             }
         });
+        //选择一个群还没实现
         mHeaderView.findViewById(R.id.tvSelectOneGroup).setOnClickListener(v -> UIUtils.showToast("选择一个群"));
+        //右侧的字母进度条
         mQib.setOnLetterUpdateListener(new QuickIndexBar.OnLetterUpdateListener() {
             @Override
             public void onLetterUpdate(String letter) {

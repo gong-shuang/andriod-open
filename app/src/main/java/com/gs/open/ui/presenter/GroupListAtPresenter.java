@@ -74,7 +74,7 @@ public class GroupListAtPresenter extends BasePresenter<IGroupListAtView> {
             LogUtils.e("groups == null || friend == null");
             return null;
         }
-        GroupMember groupMember = new GroupMember(member.getId(), friend.getName(), friend.getPortraitUri());
+        GroupMember groupMember = new GroupMember(friend.getUserId(), friend.getName(), friend.getPortraitUri());
         groupMember.setNameSpelling(PinyinUtils.getPinyin(friend.getName() == null ? "null" : friend.getName()));
         groupMember.setDisplayName(member.getAlias());
         groupMember.setDisplayNameSpelling(PinyinUtils.getPinyin(member.getAlias() == null ? "null" : member.getAlias()));

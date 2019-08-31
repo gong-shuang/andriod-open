@@ -76,7 +76,7 @@ public class SessionInfoActivity extends BaseActivity<ISessionInfoAtView, Sessio
                 mConversationType = Conversation.ConversationType.GROUP;
                 break;
         }
-        registerBR();
+//        registerBR();
     }
 
     @Override
@@ -103,21 +103,27 @@ public class SessionInfoActivity extends BaseActivity<ISessionInfoAtView, Sessio
 
     @Override
     public void initListener() {
+        //群聊名称
         mOivGroupName.setOnClickListener(v -> {
             Intent intent = new Intent(SessionInfoActivity.this, SetGroupNameActivity.class);
             intent.putExtra("groupId", mSessionId);
             startActivityForResult(intent, REQ_SET_GROUP_NAME);
         });
+        //群二维码
         mOivQRCordCard.setOnClickListener(v -> {
             Intent intent = new Intent(SessionInfoActivity.this, QRCodeCardActivity.class);
             intent.putExtra("groupId", mSessionId);
             jumpToActivity(intent);
         });
+        //我在本群的昵称
         mOivNickNameInGroup.setOnClickListener(v -> mPresenter.setDisplayName());
+        //顶置聊天
         mSbToTop.setOnCheckedChangeListener((buttonView, isChecked) -> {
             LogUtils.d("jjjjjjjjjjjjjj");
         });
+        //清空聊天记录
         mOivClearMsgRecord.setOnClickListener(v -> mPresenter.clearConversationMsg());
+        //解散该群
         mBtnQuit.setOnClickListener(v -> mPresenter.quit());
     }
 
@@ -145,7 +151,7 @@ public class SessionInfoActivity extends BaseActivity<ISessionInfoAtView, Sessio
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unRegisterBR();
+//        unRegisterBR();
     }
 
     private void registerBR() {

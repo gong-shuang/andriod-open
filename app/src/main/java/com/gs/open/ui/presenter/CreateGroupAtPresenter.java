@@ -44,7 +44,10 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-
+/**
+ * 现在的群有几个问题，
+ * List 应该换成 set，防止好友被重复添加。
+ */
 public class CreateGroupAtPresenter extends BasePresenter<ICreateGroupAtView> {
 
     private String mGroupName = "";
@@ -57,13 +60,14 @@ public class CreateGroupAtPresenter extends BasePresenter<ICreateGroupAtView> {
         super(context);
     }
 
-    public void loadContacts() {
+    public void loadContacts(ArrayList<String> userIdList) {
         loadData();
         setAdapter();
         setSelectedAdapter();
     }
 
     private void loadData() {
+        // rxjava 实现从数据库中获取
         Observable.just(DBManager.getInstance().getFriends())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -186,7 +190,12 @@ public class CreateGroupAtPresenter extends BasePresenter<ICreateGroupAtView> {
         }
     }
 
+    /**
+     * 还没实现
+     */
     public void addGroupMembers() {
+        if(mSelectedData.size() == 0)
+            return;
         ArrayList<String> selectedIds = new ArrayList<>(mSelectedData.size());
         for (int i = 0; i < mSelectedData.size(); i++) {
             Friend friend = mSelectedData.get(i);
@@ -198,11 +207,19 @@ public class CreateGroupAtPresenter extends BasePresenter<ICreateGroupAtView> {
         mContext.finish();
     }
 
+    //创建群
     public void createGroup() {
         if (mSelectedData.size() == 0)
             return;
 
-        mSelectedData.add(0, DBManager.getInstance().getFriendById(Account.getUserId()));
+        //群成员中，是不应该有自己的，自己的操作放在服务器端完成，这里如果发现有自己，就将自己移除
+        //判断是否有自己
+        int index = mSelectedData.indexOf(DBManager.getInstance().getFriendById(Account.getUserId()));
+        if( index >= 0){
+            //如果有，将自己移除
+            mSelectedData.remove(index);
+        }
+
         int size = mSelectedData.size();
         List<String> selectedIds = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {

@@ -322,6 +322,7 @@ public class DBManager {
         DataSupport.deleteAll(Friend.class, "userid = ?", friend.getUserId());
     }
 
+    //这里有个bug，因为Friend是不应该包括自己的，现在的处理是将Friend包含在里面。后期会将自己从Friend中去除。
     public synchronized Friend getFriendById(String userid) {
         if (!TextUtils.isEmpty(userid)) {
             List<Friend> friends = DataSupport.where("userid = ?", userid).find(Friend.class);
