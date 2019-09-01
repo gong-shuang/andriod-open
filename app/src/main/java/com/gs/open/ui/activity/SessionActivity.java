@@ -86,9 +86,9 @@ public class SessionActivity extends BaseFragmentActivity<ISessionAtView, Sessio
     LQRRecyclerView mRvMsg;   // 聊天的 RecyclerView
 
     @BindView(R.id.ivAudio)
-    ImageView mIvAudio;   //语言头像，点击后，语言按钮显示
+    ImageView mIvAudio;   //语音头像，点击后，语言按钮显示
     @BindView(R.id.btnAudio)
-    Button mBtnAudio;   //语言按钮，按住说话那个
+    Button mBtnAudio;   //语音按钮，按住说话那个
     @BindView(R.id.etContent)
     EditText mEtContent;   //文本框，需要发送的文字信息
     @BindView(R.id.ivEmo)
@@ -130,6 +130,7 @@ public class SessionActivity extends BaseFragmentActivity<ISessionAtView, Sessio
                 break;
         }
 
+        //初始化语言
         initAudioRecordManager();
 
         //设置会话已读
@@ -364,6 +365,8 @@ public class SessionActivity extends BaseFragmentActivity<ISessionAtView, Sessio
             @Override
             public void onStartRecord() {
 //                RongIMClient.getInstance().sendTypingStatus(mConversationType, mSessionId, VoiceMessage.class.getAnnotation(MessageTag.class).value());
+                LogUtils.d("开始录音");
+                //开始录音
             }
 
             @Override

@@ -16,9 +16,12 @@ import com.gs.factory.data.message.MessageRepository;
 import com.gs.factory.model.api.message.MsgCreateModel;
 import com.gs.factory.persistence.Account;
 import com.gs.open.temp.Conversation;
+import com.gs.open.temp.FileMessage;
+import com.gs.open.temp.ImageMessage;
 import com.gs.open.temp.Message;
 import com.gs.open.temp.MessageContent;
 import com.gs.open.temp.TextMessage;
+import com.gs.open.temp.VoiceMessage;
 import com.gs.open.ui.adapter.SessionAdapter;
 import com.lqr.audio.AudioPlayManager;
 import com.lqr.audio.IAudioPlayListener;
@@ -125,74 +128,73 @@ public class SessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> {
 
     public void setAdapter() {
         if (mAdapter == null) {
-//            LinearLayoutManager linearLayout = new LinearLayoutManager(mContext);
-//            getView().getRvMsg().setLayoutManager(linearLayout);
             mAdapter = new SessionAdapter(mContext, mData, this);
-//            mAdapter.setOnItemClickListener((helper, parent, itemView, position) -> {
-//                Message message = mData.get(position);
-//                MessageContent content = message.getContent();
-//                if (content instanceof ImageMessage) {
-//                    ImageMessage imageMessage = (ImageMessage) content;
-//                    Intent intent = new Intent(mContext, ShowBigImageActivity.class);
-//                    intent.putExtra("url", imageMessage.getLocalUri() == null ? imageMessage.getRemoteUri().toString() : imageMessage.getLocalUri().toString());
-//                    mContext.jumpToActivity(intent);
-//                } else if (content instanceof FileMessage) {
-//                    FileMessage fileMessage = (FileMessage) content;
-//                    if (MediaFileUtils.isVideoFileType(fileMessage.getName())) {
-//                        helper.getView(R.id.bivPic).setOnClickListener(v -> {
-//                            boolean isSend = message.getMessageDirection() == Message.MessageDirection.SEND ? true : false;
-//                            if (isSend) {
-//                                if (fileMessage.getLocalPath() != null && new File(fileMessage.getLocalPath().getPath()).exists()) {
-//                                    FileOpenUtils.openFile(mContext, fileMessage.getLocalPath().getPath());
-//                                } else {
-//                                    downloadMediaMessage(message);
-//                                }
-//                            } else {
-//                                Message.ReceivedStatus receivedStatus = message.getReceivedStatus();
-//                                if (receivedStatus.isDownload() || receivedStatus.isRetrieved()) {
-//                                    if (fileMessage.getLocalPath() != null) {
-//                                        FileOpenUtils.openFile(mContext, fileMessage.getLocalPath().getPath());
-//                                    } else {
-//                                        UIUtils.showToast(UIUtils.getString(R.string.file_out_of_date));
-//                                    }
-//                                } else {
-//                                    downloadMediaMessage(message);
-//                                }
-//                            }
-//                        });
-//                    }
-//                } else if (content instanceof VoiceMessage) {
-//                    VoiceMessage voiceMessage = (VoiceMessage) content;
-//                    final ImageView ivAudio = helper.getView(R.id.ivAudio);
-//                    AudioPlayManager.getInstance().startPlay(mContext, voiceMessage.getUri(), new IAudioPlayListener() {
-//                        @Override
-//                        public void onStart(Uri var1) {
-//                            if (ivAudio != null && ivAudio.getBackground() instanceof AnimationDrawable) {
-//                                AnimationDrawable animation = (AnimationDrawable) ivAudio.getBackground();
-//                                animation.start();
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onStop(Uri var1) {
-//                            if (ivAudio != null && ivAudio.getBackground() instanceof AnimationDrawable) {
-//                                AnimationDrawable animation = (AnimationDrawable) ivAudio.getBackground();
-//                                animation.stop();
-//                                animation.selectDrawable(0);
-//                            }
-//
-//                        }
-//
-//                        @Override
-//                        public void onComplete(Uri var1) {
-//                            if (ivAudio != null && ivAudio.getBackground() instanceof AnimationDrawable) {
-//                                AnimationDrawable animation = (AnimationDrawable) ivAudio.getBackground();
-//                                animation.stop();
-//                                animation.selectDrawable(0);
-//                            }
-//                        }
-//                    });
-//                } else if (content instanceof RedPacketMessage) {
+            mAdapter.setOnItemClickListener((helper, parent, itemView, position) -> {
+                Message message = mData.get(position);
+                MessageContent content = message.getContent();
+                if (content instanceof ImageMessage) {
+                    ImageMessage imageMessage = (ImageMessage) content;
+                    Intent intent = new Intent(mContext, ShowBigImageActivity.class);
+                    intent.putExtra("url", imageMessage.getLocalUri() == null ? imageMessage.getRemoteUri().toString() : imageMessage.getLocalUri().toString());
+                    mContext.jumpToActivity(intent);
+                } else if (content instanceof FileMessage) {
+                    FileMessage fileMessage = (FileMessage) content;
+                    if (MediaFileUtils.isVideoFileType(fileMessage.getName())) {
+                        helper.getView(R.id.bivPic).setOnClickListener(v -> {
+                            boolean isSend = message.getMessageDirection() == Message.MessageDirection.SEND ? true : false;
+                            if (isSend) {
+                                if (fileMessage.getLocalPath() != null && new File(fileMessage.getLocalPath().getPath()).exists()) {
+                                    FileOpenUtils.openFile(mContext, fileMessage.getLocalPath().getPath());
+                                } else {
+                                    downloadMediaMessage(message);
+                                }
+                            } else {
+                                Message.ReceivedStatus receivedStatus = message.getReceivedStatus();
+                                if (receivedStatus.isDownload() || receivedStatus.isRetrieved()) {
+                                    if (fileMessage.getLocalPath() != null) {
+                                        FileOpenUtils.openFile(mContext, fileMessage.getLocalPath().getPath());
+                                    } else {
+                                        UIUtils.showToast(UIUtils.getString(R.string.file_out_of_date));
+                                    }
+                                } else {
+                                    downloadMediaMessage(message);
+                                }
+                            }
+                        });
+                    }
+                } else if (content instanceof VoiceMessage) {
+                    VoiceMessage voiceMessage = (VoiceMessage) content;
+                    final ImageView ivAudio = helper.getView(R.id.ivAudio);
+                    AudioPlayManager.getInstance().startPlay(mContext, voiceMessage.getUri(), new IAudioPlayListener() {
+                        @Override
+                        public void onStart(Uri var1) {
+                            if (ivAudio != null && ivAudio.getBackground() instanceof AnimationDrawable) {
+                                AnimationDrawable animation = (AnimationDrawable) ivAudio.getBackground();
+                                animation.start();
+                            }
+                        }
+
+                        @Override
+                        public void onStop(Uri var1) {
+                            if (ivAudio != null && ivAudio.getBackground() instanceof AnimationDrawable) {
+                                AnimationDrawable animation = (AnimationDrawable) ivAudio.getBackground();
+                                animation.stop();
+                                animation.selectDrawable(0);
+                            }
+
+                        }
+
+                        @Override
+                        public void onComplete(Uri var1) {
+                            if (ivAudio != null && ivAudio.getBackground() instanceof AnimationDrawable) {
+                                AnimationDrawable animation = (AnimationDrawable) ivAudio.getBackground();
+                                animation.stop();
+                                animation.selectDrawable(0);
+                            }
+                        }
+                    });
+                }
+//                else if (content instanceof RedPacketMessage) {
 //                    RedPacketMessage redPacketMessage = (RedPacketMessage) content;
 //                    int chatType = mConversationType == Conversation.ConversationType.PRIVATE ? RPConstant.RP_ITEM_TYPE_SINGLE : RPConstant.RP_ITEM_TYPE_GROUP;
 //                    String redPacketId = redPacketMessage.getBribery_ID();
@@ -201,7 +203,7 @@ public class SessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> {
 //                    String direct = RPConstant.MESSAGE_DIRECT_RECEIVE;
 //                    RedPacketUtil.openRedPacket(((SessionActivity) mContext), chatType, redPacketId, redPacketType, receiverId, direct);
 //                }
-//            });
+            });
             getView().getRvMsg().setAdapter(mAdapter);
 //            mAdapter.setOnItemLongClickListener((helper, viewGroup, view, position) -> {
 //                View sessionMenuView = View.inflate(mContext, R.layout.dialog_session_menu, null);
@@ -317,19 +319,7 @@ public class SessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> {
     public void sendTextMsg() {
         String content = getView().getEtContent().getText().toString();
         getView().getEtContent().setText("");
-
-        int type = mConversationType == Conversation.ConversationType.PRIVATE ?
-                com.gs.factory.model.db.Message.RECEIVER_TYPE_NONE :
-                com.gs.factory.model.db.Message.RECEIVER_TYPE_GROUP;
-
-        // 构建一个新的消息
-        MsgCreateModel model = new MsgCreateModel.Builder()
-                .receiver(mSessionId, type)
-                .content(content, com.gs.factory.model.db.Message.TYPE_STR)
-                .build();
-
-        // 进行网络发送
-        MessageHelper.push(model);
+        sendTextMsg(content);
     }
 
     public void sendTextMsg(String content) {
@@ -358,6 +348,19 @@ public class SessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> {
 //
 //                    }
 //                });
+
+        int type = mConversationType == Conversation.ConversationType.PRIVATE ?
+                com.gs.factory.model.db.Message.RECEIVER_TYPE_NONE :
+                com.gs.factory.model.db.Message.RECEIVER_TYPE_GROUP;
+
+        // 构建一个新的消息
+        MsgCreateModel model = new MsgCreateModel.Builder()
+                .receiver(mSessionId, type)
+                .content(content, com.gs.factory.model.db.Message.TYPE_STR)
+                .build();
+
+        // 进行网络发送
+        MessageHelper.push(model);
     }
 
     public void sendImgMsg(Uri imageFileThumbUri, Uri imageFileSourceUri) {
@@ -459,12 +462,12 @@ public class SessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> {
     }
 
     public void sendAudioFile(Uri audioPath, int duration) {
-//        if (audioPath != null) {
-//            File file = new File(audioPath.getPath());
-//            if (!file.exists() || file.length() == 0L) {
-//                LogUtils.sf(UIUtils.getString(R.string.send_audio_fail));
-//                return;
-//            }
+        if (audioPath != null) {
+            File file = new File(audioPath.getPath());
+            if (!file.exists() || file.length() == 0L) {
+                LogUtils.sf(UIUtils.getString(R.string.send_audio_fail));
+                return;
+            }
 //            VoiceMessage voiceMessage = VoiceMessage.obtain(audioPath, duration);
 //            RongIMClient.getInstance().sendMessage(Message.obtain(mSessionId, mConversationType, voiceMessage), mPushCotent, mPushData, new IRongCallback.ISendMessageCallback() {
 //                @Override
@@ -486,7 +489,26 @@ public class SessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> {
 //                    updateMessageStatus(message);
 //                }
 //            });
-//        }
+
+            int mReceiverType;
+
+            if(mConversationType  == Conversation.ConversationType.PRIVATE){
+                mReceiverType = com.gs.factory.model.db.Message.RECEIVER_TYPE_NONE;
+            }
+            else{
+                mReceiverType = com.gs.factory.model.db.Message.RECEIVER_TYPE_GROUP;
+            }
+
+            // 构建一个新的消息
+            MsgCreateModel model = new MsgCreateModel.Builder()
+                    .receiver(mSessionId, mReceiverType)
+                    .content(file.getAbsolutePath(), com.gs.factory.model.db.Message.TYPE_AUDIO)
+                    .attach(String.valueOf(duration * 1000))
+                    .build();
+
+            // 进行网络发送
+            MessageHelper.push(model);
+        }
     }
 
     public void sendRedPacketMsg() {
@@ -567,6 +589,11 @@ public class SessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> {
         if(message.getType()==com.gs.factory.model.db.Message.TYPE_STR){
             TextMessage textMessage = new TextMessage(message.getContent());
             messageUI.setContent(textMessage);
+        }else if(message.getType()==com.gs.factory.model.db.Message.TYPE_AUDIO){
+            VoiceMessage voiceMessage = VoiceMessage.obtain(Uri.parse(message.getContent()), Integer.parseInt(message.getAttach())/1000);
+            messageUI.setContent(voiceMessage);
+        }else {
+            return null;
         }
         messageUI.setConversationType((message.getReceiver() == null && message.getGroup() != null)?
                 Conversation.ConversationType.GROUP :

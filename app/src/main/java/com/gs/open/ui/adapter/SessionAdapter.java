@@ -15,6 +15,7 @@ import com.gs.open.temp.Message;
 import com.gs.open.temp.MessageContent;
 import com.gs.open.temp.TextMessage;
 import com.gs.open.temp.UserInfo;
+import com.gs.open.temp.VoiceMessage;
 import com.gs.open.util.LogUtils;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;
@@ -173,15 +174,17 @@ public class SessionAdapter extends LQRAdapterForRecyclerView<Message> {
 //            } catch (HttpException e) {
 //                e.printStackTrace();
 //            }
-//        } else if (msgContent instanceof VoiceMessage) {
-//            VoiceMessage voiceMessage = (VoiceMessage) msgContent;
-//            int increment = (int) (UIUtils.getDisplayWidth() / 2 / AppConst.DEFAULT_MAX_AUDIO_RECORD_TIME_SECOND * voiceMessage.getDuration());
-//
-//            RelativeLayout rlAudio = helper.setText(R.id.tvDuration, voiceMessage.getDuration() + "''").getView(R.id.rlAudio);
-//            ViewGroup.LayoutParams params = rlAudio.getLayoutParams();
-//            params.width = UIUtils.dip2Px(65) + UIUtils.dip2Px(increment);
-//            rlAudio.setLayoutParams(params);
-//        } else if (msgContent instanceof RedPacketMessage) {
+//        }
+        else if (msgContent instanceof VoiceMessage) {
+            VoiceMessage voiceMessage = (VoiceMessage) msgContent;
+            int increment = (int) (UIUtils.getDisplayWidth() / 2 / AppConst.DEFAULT_MAX_AUDIO_RECORD_TIME_SECOND * voiceMessage.getDuration());
+
+            RelativeLayout rlAudio = helper.setText(R.id.tvDuration, voiceMessage.getDuration() + "''").getView(R.id.rlAudio);
+            ViewGroup.LayoutParams params = rlAudio.getLayoutParams();
+            params.width = UIUtils.dip2Px(65) + UIUtils.dip2Px(increment);
+            rlAudio.setLayoutParams(params);
+        }
+//        else if (msgContent instanceof RedPacketMessage) {
 //            RedPacketMessage redPacketMessage = (RedPacketMessage) msgContent;
 //            helper.setText(R.id.tvRedPacketGreeting, redPacketMessage.getContent());
 //        } else if (msgContent instanceof RecallNotificationMessage) {
@@ -202,9 +205,13 @@ public class SessionAdapter extends LQRAdapterForRecyclerView<Message> {
 //            }
 //            helper.setText(R.id.tvNotification, UIUtils.getString(R.string.recall_one_message, operatorName));
 //        }
+        else{
+            LogUtils.e("error message not type!");
+        }
     }
 
     private void setOnClick(LQRViewHolderForRecyclerView helper, Message item, int position) {
+        //消息发送失败监听
 //        helper.getView(R.id.llError).setOnClickListener(v ->
 //                RongIMClient.getInstance().deleteMessages(new int[]{item.getMessageId()}, new RongIMClient.ResultCallback<Boolean>() {
 //                    @Override
@@ -245,7 +252,7 @@ public class SessionAdapter extends LQRAdapterForRecyclerView<Message> {
     private void setStatus(LQRViewHolderForRecyclerView helper, Message item, int position) {
         MessageContent msgContent = item.getContent();
 //        if (msgContent instanceof TextMessage || msgContent instanceof LocationMessage || msgContent instanceof VoiceMessage) {
-        if (msgContent instanceof TextMessage) {
+        if (msgContent instanceof TextMessage || msgContent instanceof VoiceMessage) {
             //只需要设置自己发送的状态
             Message.SentStatus sentStatus = item.getSentStatus();
             if (sentStatus == Message.SentStatus.SENDING) {
@@ -412,9 +419,9 @@ public class SessionAdapter extends LQRAdapterForRecyclerView<Message> {
 //        if (msgContent instanceof GroupNotificationMessage) {
 //            return RECEIVE_NOTIFICATION;
 //        }
-//        if (msgContent instanceof VoiceMessage) {
-//            return isSend ? SEND_VOICE : RECEIVE_VOICE;
-//        }
+        if (msgContent instanceof VoiceMessage) {
+            return isSend ? SEND_VOICE : RECEIVE_VOICE;
+        }
 //        if (msgContent instanceof RedPacketMessage) {
 //            return isSend ? SEND_RED_PACKET : RECEIVE_RED_PACKET;
 //        }
