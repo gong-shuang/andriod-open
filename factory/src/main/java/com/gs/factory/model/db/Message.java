@@ -21,19 +21,27 @@ import java.util.Objects;
 @Table(database = AppDatabase.class)
 public class Message extends BaseDbModel<Message> implements Serializable {
     // 接收者类型
-    public static final int RECEIVER_TYPE_NONE = 1;
-    public static final int RECEIVER_TYPE_GROUP = 2;
+    public static final int RECEIVER_TYPE_NONE = 1;  //个人
+    public static final int RECEIVER_TYPE_GROUP = 2;  //群
 
-    // 消息类型
+    // 普通消息类型
     public static final int TYPE_STR = 1;
     public static final int TYPE_PIC = 2;
     public static final int TYPE_FILE = 3;
     public static final int TYPE_AUDIO = 4;
+    public static final int TYPE_VIDEO = 5;
+    public static final int TYPE_LOCATION = 6;  //位置
+
+//    // 以下为通知类的消息
+//    public static final int TYPE_ADD_GROUP = 6;
+//    public static final int TYPE_ADD_FRIEND = 7;
 
     // 消息状态
     public static final int STATUS_DONE = 0; // 正常状态
     public static final int STATUS_CREATED = 1; // 创建状态
     public static final int STATUS_FAILED = 2; // 发送失败状态
+//    public static final int STATUS_UNREAD = 3; // 未读
+//    public static final int STATUS_READED = 4; // 已读
 
     @PrimaryKey
     private String id;//主键
@@ -41,6 +49,8 @@ public class Message extends BaseDbModel<Message> implements Serializable {
     private String content;// 内容
     @Column
     private String attach;// 附属信息
+    @Column
+    private String localPath;  //本地路径
     @Column
     private int type;// 消息类型
     @Column
@@ -130,6 +140,15 @@ public class Message extends BaseDbModel<Message> implements Serializable {
         this.receiver = receiver;
     }
 
+    public String getLocalPath() {
+        return localPath;
+    }
+
+    public void setLocalPath(String localPath) {
+        this.localPath = localPath;
+    }
+
+
     /**
      * 当消息类型为普通消息（发送给人的消息）
      * 该方法用于返回，和我聊天的人是谁
@@ -177,7 +196,8 @@ public class Message extends BaseDbModel<Message> implements Serializable {
                 && Objects.equals(createAt, message.createAt)
                 && Objects.equals(group, message.group)
                 && Objects.equals(sender, message.sender)
-                && Objects.equals(receiver, message.receiver);
+                && Objects.equals(receiver, message.receiver)
+                && Objects.equals(localPath, message.localPath);
     }
 
     @Override

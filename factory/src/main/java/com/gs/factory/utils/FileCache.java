@@ -1,11 +1,15 @@
 package com.gs.factory.utils;
 
+import android.os.Environment;
+import android.util.Log;
+
 import com.gs.factory.common.app.Application;
 import com.gs.factory.net.Network;
 import com.gs.factory.utils.HashUtil;
 import com.gs.factory.utils.StreamUtil;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.SoftReference;

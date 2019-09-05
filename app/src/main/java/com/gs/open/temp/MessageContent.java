@@ -1,11 +1,10 @@
 package com.gs.open.temp;
 
 import android.net.Uri;
-import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 
-import com.gs.open.util.LogUtils;
+import com.gs.base.util.LogUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;

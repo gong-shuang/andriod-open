@@ -21,7 +21,7 @@ import com.gs.open.ui.activity.NewFriendActivity;
 import com.gs.open.ui.base.BaseFragment;
 import com.gs.open.ui.presenter.ContactsFgPresenter;
 import com.gs.open.ui.view.IContactsFgView;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.UIUtils;
 import com.gs.open.widget.QuickIndexBar;
 
 import java.util.List;

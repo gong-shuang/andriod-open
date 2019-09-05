@@ -1,15 +1,9 @@
 package com.gs.open.ui.fragment;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.LogUtils;
+import com.gs.base.util.UIUtils;
 import com.lqr.recyclerview.LQRRecyclerView;
 import com.gs.open.R;
-import com.gs.open.app.AppConst;
-import com.gs.open.manager.BroadcastManager;
 import com.gs.open.ui.activity.MainActivity;
 import com.gs.open.ui.base.BaseFragment;
 import com.gs.open.ui.presenter.RecentMessageFgPresenter;
@@ -39,7 +33,7 @@ public class RecentMessageFragment extends BaseFragment<IRecentMessageFgView, Re
 //        if (!isFirst) {
 //            mPresenter.getConversations();
 //        }
-        mPresenter.getConversations(); // 界面可见的时候，进行一次数据加载
+ //       mPresenter.getConversations(); // 界面可见的时候，进行一次数据加载
     }
 
     @Override

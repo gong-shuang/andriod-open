@@ -1,6 +1,6 @@
 package com.gs.open.model.response;
 
-import com.gs.open.util.PinyinUtils;
+import com.gs.base.util.PinyinUtils;
 
 import java.util.List;
 

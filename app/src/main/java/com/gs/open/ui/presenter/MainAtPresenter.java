@@ -1,16 +1,10 @@
 package com.gs.open.ui.presenter;
 
-import com.gs.open.R;
-import com.gs.open.app.AppConst;
-import com.gs.open.app.MyApp;
-import com.gs.open.db.DBManager;
-import com.gs.open.manager.BroadcastManager;
-import com.gs.open.model.cache.UserCache;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.IMainAtView;
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.LogUtils;
+import com.gs.base.util.UIUtils;
 
 
 public class MainAtPresenter extends BasePresenter<IMainAtView> {

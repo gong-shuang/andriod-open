@@ -15,9 +15,9 @@ import com.gs.open.db.model.Friend;
 import com.gs.open.manager.BroadcastManager;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.PinyinUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.LogUtils;
+import com.gs.base.util.PinyinUtils;
+import com.gs.base.util.UIUtils;
 
 import butterknife.BindView;
 import rx.android.schedulers.AndroidSchedulers;

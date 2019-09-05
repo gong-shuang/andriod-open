@@ -15,10 +15,18 @@ import java.util.Objects;
  * @author qiujuer Email:qiujuer@live.cn
  * @version 1.0.0
  */
+
+/**
+ * 包括 好友，陌生人，自己
+ */
 @Table(database = AppDatabase.class)
 public class User extends BaseDbModel<User> implements Author, Comparable<User> {
     public static final int SEX_MAN = 1;
     public static final int SEX_WOMAN = 2;
+
+    public static final int ROLE_FRIEND = 1;
+    public static final int ROLE_STRANGER = 2;
+    public static final int ROLE_SELF = 3;
 
     // 主键
     @PrimaryKey
@@ -26,9 +34,13 @@ public class User extends BaseDbModel<User> implements Author, Comparable<User> 
     @Column
     private String name;
     @Column
+    private int role;  //角色，好友，陌生人，自己
+    @Column
     private String phone;
     @Column
     private String portrait;
+    @Column
+    private String localPortrait;  //本地头像
     @Column
     private String desc;
     @Column
@@ -142,6 +154,22 @@ public class User extends BaseDbModel<User> implements Author, Comparable<User> 
         this.modifyAt = modifyAt;
     }
 
+    public String getLocalPortrait() {
+        return localPortrait;
+    }
+
+    public void setLocalPortrait(String localPortrait) {
+        this.localPortrait = localPortrait;
+    }
+
+    public int getRole() {
+        return role;
+    }
+
+    public void setRole(int role) {
+        this.role = role;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -151,13 +179,15 @@ public class User extends BaseDbModel<User> implements Author, Comparable<User> 
                 && follows == user.follows
                 && following == user.following
                 && isFollow == user.isFollow
+                && role == user.role
                 && Objects.equals(id, user.id)
                 && Objects.equals(name, user.name)
                 && Objects.equals(phone, user.phone)
                 && Objects.equals(portrait, user.portrait)
                 && Objects.equals(desc, user.desc)
                 && Objects.equals(alias, user.alias)
-                && Objects.equals(modifyAt, user.modifyAt);
+                && Objects.equals(modifyAt, user.modifyAt)
+                && Objects.equals(localPortrait, user.localPortrait);
     }
 
     @Override

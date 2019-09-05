@@ -58,6 +58,5 @@ dependencies {
     api "net.qiujuer.genius:kit-handler:2.1.1"
     api "net.qiujuer.genius:ui:2.1.1"
 
-    //multidex
-    api 'com.android.support:multidex:1.0.1'
+    api project(':base')
 }

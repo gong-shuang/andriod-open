@@ -1,6 +1,5 @@
 package com.gs.open.util;
 
-import com.gs.factory.model.db.User;
 import com.gs.open.db.model.Friend;
 
 import java.util.ArrayList;

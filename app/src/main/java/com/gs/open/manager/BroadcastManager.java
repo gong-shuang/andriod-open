@@ -65,14 +65,14 @@ public class BroadcastManager {
      * @param obj    参数
      */
     public void sendBroadcastWithObjct(String action, Object obj) {
-        try {
+//        try {
             Intent intent = new Intent();
             intent.setAction(action);
             intent.putExtra("result", JsonMananger.beanToJson(obj));
             mContext.sendBroadcast(intent);
-        } catch (HttpException e) {
-            e.printStackTrace();
-        }
+//        } catch (HttpException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public void sendBroadcast(String action, Parcelable obj) {

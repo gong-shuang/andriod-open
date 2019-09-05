@@ -1,8 +1,8 @@
 package com.gs.open.app;
 
 
-import com.gs.open.util.FileUtils;
-import com.gs.open.util.LogUtils;
+import com.gs.base.util.FileUtils;
+import com.gs.base.util.LogUtils;
 
 /**
  * @创建者 CSDN_LQR
@@ -11,7 +11,6 @@ import com.gs.open.util.LogUtils;
 public class AppConst {
 
     public static final String TAG = "debug";
-    public static final int DEBUGLEVEL = LogUtils.LEVEL_ALL;//日志输出级别
 
     public static final String REGION = "86";
 
@@ -72,4 +71,6 @@ public class AppConst {
     public static final String PHOTO_SAVE_DIR = FileUtils.getDir("photo");
     //头像保存位置
     public static final String HEADER_SAVE_DIR = FileUtils.getDir("header");
+    //文件存放位置
+    public static final String FILE_SAVE_DIR = FileUtils.getDir("files");
 }

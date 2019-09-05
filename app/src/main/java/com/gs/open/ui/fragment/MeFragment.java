@@ -9,7 +9,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.gs.open.temp.UserInfo;
+////import com.gs.open.temp.UserInfo;
+import com.gs.factory.model.db.User;
 import com.lqr.optionitemview.OptionItemView;
 import com.gs.open.R;
 import com.gs.open.app.AppConst;
@@ -20,8 +21,8 @@ import com.gs.open.ui.activity.SettingActivity;
 import com.gs.open.ui.base.BaseFragment;
 import com.gs.open.ui.presenter.MeFgPresenter;
 import com.gs.open.ui.view.IMeFgView;
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.LogUtils;
+import com.gs.base.util.UIUtils;
 import com.gs.open.widget.CustomDialog;
 
 import butterknife.BindView;
@@ -102,11 +103,11 @@ public class MeFragment extends BaseFragment<IMeFgView, MeFgPresenter> implement
             TextView tvTip = (TextView) qrCardView.findViewById(R.id.tvTip);
             tvTip.setText(UIUtils.getString(R.string.qr_code_card_tip));
 
-            UserInfo userInfo = mPresenter.getUserInfo();
+            User userInfo = mPresenter.getUserInfo();
             if (userInfo != null) {
-                Glide.with(getActivity()).load(userInfo.getPortraitUri()).centerCrop().into(ivHeader);
+                Glide.with(getActivity()).load(userInfo.getPortrait()).centerCrop().into(ivHeader);
                 tvName.setText(userInfo.getName());
-                Observable.just(QRCodeEncoder.syncEncodeQRCode(AppConst.QrCodeCommon.ADD + userInfo.getUserId(), UIUtils.dip2Px(100)))
+                Observable.just(QRCodeEncoder.syncEncodeQRCode(AppConst.QrCodeCommon.ADD + userInfo.getId(), UIUtils.dip2Px(100)))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(bitmap -> ivCard.setImageBitmap(bitmap), this::loadQRCardError);

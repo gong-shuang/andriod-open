@@ -2,8 +2,8 @@ package com.gs.open.model.cache;
 
 import com.gs.open.app.AppConst;
 import com.gs.open.db.DBManager;
-import com.gs.open.util.SPUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.SPUtils;
+import com.gs.base.util.UIUtils;
 
 /**
  * @创建者 CSDN_LQR

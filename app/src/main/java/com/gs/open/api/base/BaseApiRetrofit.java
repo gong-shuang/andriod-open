@@ -8,8 +8,8 @@ import com.gs.open.api.base.persistentcookiejar.PersistentCookieJar;
 import com.gs.open.api.base.persistentcookiejar.cache.SetCookieCache;
 import com.gs.open.api.base.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.gs.open.app.MyApp;
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.NetUtils;
+import com.gs.base.util.LogUtils;
+import com.gs.base.util.NetUtils;
 
 import java.io.File;
 import java.io.IOException;

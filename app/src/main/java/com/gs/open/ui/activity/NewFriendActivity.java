@@ -9,7 +9,7 @@ import com.gs.open.R;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.presenter.NewFriendAtPresenter;
 import com.gs.open.ui.view.INewFriendAtView;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.UIUtils;
 
 import butterknife.BindView;
 

@@ -5,6 +5,8 @@ import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
+import com.gs.factory.manager.MyMessageHandler;
+import com.gs.factory.utils.FileUtil;
 import com.raizlabs.android.dbflow.sql.language.OperatorGroup;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
@@ -54,11 +56,9 @@ public class MessageHelper {
                 if (message != null && message.getStatus() != Message.STATUS_FAILED)
                     return;
 
-
                 // 我们在发送的时候需要通知界面更新状态，Card;
                 final MessageCard card = model.buildCard();
                 Factory.getMessageCenter().dispatch(card);
-
 
                 // 发送文件消息分两部：上传到云服务器，消息Push到我们自己的服务器
 
@@ -75,6 +75,9 @@ public class MessageHelper {
                                 break;
                             case Message.TYPE_AUDIO:
                                 content = uploadAudio(card.getContent());
+                                break;
+                            case Message.TYPE_FILE:
+                                content = uploadVideo(card.getContent());
                                 break;
                             default:
                                 content = "";
@@ -98,7 +101,6 @@ public class MessageHelper {
                         model.refreshByCard();
                     }
                 }
-
 
                 // 直接发送, 进行网络调度
                 RemoteService service = Network.remote();
@@ -177,6 +179,16 @@ public class MessageHelper {
         return UploadHelper.uploadAudio(content);
     }
 
+    // 上传语音
+    private static String uploadVideo(String content) {
+        // 上传语音
+        File file = new File(content);
+        if (!file.exists() || file.length() <= 0)
+            return null;
+        // 上传并返回
+        return UploadHelper.uploadVideo(content);
+    }
+
     /**
      * 查询一个消息，这个消息是一个群中的最后一条消息
      *
@@ -206,5 +218,27 @@ public class MessageHelper {
                 .or(Message_Table.receiver_id.eq(userId))
                 .orderBy(Message_Table.createAt, false) // 倒序查询
                 .querySingle();
+    }
+
+    public static void getLocalFileByOssAndUpdateDB(final Message message){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //从网络下载文件到本地
+                String localFile = FileUtil.getLocalFileByOSS(message.getContent());
+                if(localFile == null)
+                    return ;
+
+                //查询本地的数据库
+                Message meg = findFromLocal(message.getId());
+                if (meg == null)
+                    return ;
+
+                message.setLocalPath(localFile);
+                //保存到数据库中。
+                DbHelper.save(Message.class, message);
+                MyMessageHandler.getInstance().add(message);
+            }
+        }).start();
     }
 }

@@ -9,7 +9,8 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.gs.open.temp.UserInfo;
+import com.gs.base.util.UIUtils;
+////import com.gs.open.temp.UserInfo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -65,12 +66,12 @@ public class RongGenerate {
         return saveBitmap(bitmap, string + "_" + userid);
     }
 
-    public static String generateDefaultAvatar(UserInfo userInfo) {
-        if (userInfo == null)
-            return null;
-        else
-            return generateDefaultAvatar(userInfo.getName(), userInfo.getUserId());
-    }
+//    public static String generateDefaultAvatar(UserInfo userInfo) {
+//        if (userInfo == null)
+//            return null;
+//        else
+//            return generateDefaultAvatar(userInfo.getName(), userInfo.getUserId());
+//    }
 
     private static void createDir(String saveaddress) {
         boolean b;

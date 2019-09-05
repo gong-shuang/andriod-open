@@ -37,6 +37,11 @@ public class Session extends BaseDbModel<Session> {
     private int unReadCount; // 未读数量，当没有在当前界面时，应当增加未读数量
     @Column
     private Date modifyAt; // 最后更改时间
+    @Column
+    private boolean top; //是否置顶
+    @Column
+    private String draft ; //草稿
+
 
     @ForeignKey(tableClass = Message.class)
     private Message message; // 对应的消息，外键为Message的Id
@@ -66,6 +71,7 @@ public class Session extends BaseDbModel<Session> {
         this.message = message;
         this.content = message.getSampleContent();
         this.modifyAt = message.getCreateAt();
+        this.top = false;
     }
 
     public String getId() {
@@ -132,6 +138,22 @@ public class Session extends BaseDbModel<Session> {
         this.modifyAt = modifyAt;
     }
 
+    public boolean isTop() {
+        return top;
+    }
+
+    public void setTop(boolean top) {
+        this.top = top;
+    }
+
+    public String getDraft() {
+        return draft;
+    }
+
+    public void setDraft(String draft) {
+        this.draft = draft;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -141,6 +163,7 @@ public class Session extends BaseDbModel<Session> {
 
         return receiverType == session.receiverType
                 && unReadCount == session.unReadCount
+                && top == session.top
                 && Objects.equals(id, session.id)
                 && Objects.equals(picture, session.picture)
                 && Objects.equals(title, session.title)

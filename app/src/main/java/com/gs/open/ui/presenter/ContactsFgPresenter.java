@@ -1,32 +1,29 @@
 package com.gs.open.ui.presenter;
 
 import android.content.Intent;
-import android.support.v7.util.DiffUtil;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.gs.factory.Factory;
 import com.gs.factory.common.data.DataSource;
 import com.gs.factory.data.helper.UserHelper;
-import com.gs.factory.data.user.ContactDataSource;
 import com.gs.factory.data.user.ContactRepository;
 import com.gs.factory.model.db.User;
-import com.gs.open.util.PinyinUtils;
+import com.gs.base.util.PinyinUtils;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRHeaderAndFooterAdapter;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;
 import com.gs.open.R;
 import com.gs.open.db.DBManager;
-import com.gs.open.db.model.Friend;
+//import com.gs.open.db.model.Friend;
 import com.gs.open.ui.activity.UserInfoActivity;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.IContactsFgView;
-import com.gs.open.util.LogUtils;
+import com.gs.base.util.LogUtils;
 import com.gs.open.util.SortUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.UIUtils;
 
 import net.qiujuer.genius.kit.handler.Run;
 import net.qiujuer.genius.kit.handler.runable.Action;
@@ -34,14 +31,11 @@ import net.qiujuer.genius.kit.handler.runable.Action;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-
 
 public class ContactsFgPresenter extends BasePresenter<IContactsFgView> {
 
-    private List<Friend> mData = new ArrayList<>();
+//    private List<Friend> mData = new ArrayList<>();
+    private List<User> mData = new ArrayList<>();
     private List<User> mDataByUser = new ArrayList<>();
     private LQRHeaderAndFooterAdapter mAdapter;
     private ContactRepository contactRepository; //gs-add
@@ -59,35 +53,35 @@ public class ContactsFgPresenter extends BasePresenter<IContactsFgView> {
     }
 
     public void loadContacts() {
-        contactRepository.load(new DataSource.SucceedCallback<List<User>>(){
+        contactRepository.getDataByDB(new DataSource.SucceedCallback<List<User>>(){
             // 运行到这里的时候是子线程
             @Override
             public void onDataLoaded(List<User> users) {
                 LogUtils.d("loadContacts(), thread: " + Thread.currentThread().getName());
                 if (users != null && users.size() > 0) {
-                    List<Friend> friends = new ArrayList<>();
-                    for(User user: users){
-                        Friend friend = new Friend(
-                                user.getId(),
-                                user.getName(),
-                                user.getPortrait(),
-                                TextUtils.isEmpty(user.getAlias()) ? user.getName() : user.getAlias(),
-                                null, user.getPhone(), null, null,
-                                PinyinUtils.getPinyin(user.getName()),
-                                PinyinUtils.getPinyin(TextUtils.isEmpty(user.getAlias()) ? user.getName() : user.getAlias())
-                        );
-                        if (TextUtils.isEmpty(friend.getPortraitUri())) {
-                            friend.setPortraitUri(DBManager.getInstance().getPortrait(friend));
-                        }
-                        friends.add(friend);
-                    }
+//                    List<Friend> friends = new ArrayList<>();
+//                    for(User user: users){
+//                        Friend friend = new Friend(
+//                                user.getId(),
+//                                user.getName(),
+//                                user.getPortrait(),
+//                                TextUtils.isEmpty(user.getAlias()) ? user.getName() : user.getAlias(),
+//                                null, user.getPhone(), null, null,
+//                                PinyinUtils.getPinyin(user.getName()),
+//                                PinyinUtils.getPinyin(TextUtils.isEmpty(user.getAlias()) ? user.getName() : user.getAlias())
+//                        );
+//                        if (TextUtils.isEmpty(friend.getPortraitUri())) {
+//                            friend.setPortraitUri(DBManager.getInstance().getPortrait(friend));
+//                        }
+//                        friends.add(friend);
+//                    }
                     mData.clear();
-                    mData.addAll(friends);
+                    mData.addAll(users);
                     if(getView() == null)
                         return;
                     getView().getFooterView().setText(UIUtils.getString(R.string.count_of_contacts, mData.size()));
-                    //整理排序
-                    SortUtils.sortContacts(mData);
+                    //不需要排序，冲数据库中获取的，是已经排序好的
+//                    SortUtils.sortContacts(mData);
 
                     Run.onUiAsync(new Action() {
                         @Override
@@ -99,7 +93,7 @@ public class ContactsFgPresenter extends BasePresenter<IContactsFgView> {
                     });
 
                     //数据库操作，这里不能全部删除，因为还存储了本身的信息。
-                    DBManager.getInstance().saveOrUpdateFriendsByFriends(mData);
+//                    DBManager.getInstance().saveOrUpdateFriendsByFriends(mData);
 
                 }
             }
@@ -124,27 +118,28 @@ public class ContactsFgPresenter extends BasePresenter<IContactsFgView> {
 //                    }
 //                }, this::loadError);
 
-        // 加载网络数据
+        // 加载网络数据，在启动Activity的时候，不从网络加载，只从本地获取，
+        // 用户在下拉刷新的时候，才去更新
         UserHelper.refreshContacts();
     }
 
     private void setAdapter() {
         if (mAdapter == null) {
-            LQRAdapterForRecyclerView adapter = new LQRAdapterForRecyclerView<Friend>(mContext, mData, R.layout.item_contact) {
+            LQRAdapterForRecyclerView adapter = new LQRAdapterForRecyclerView<User>(mContext, mData, R.layout.item_contact) {
                 @Override
-                public void convert(LQRViewHolderForRecyclerView helper, Friend item, int position) {
-                    helper.setText(R.id.tvName, item.getDisplayName());
+                public void convert(LQRViewHolderForRecyclerView helper, User item, int position) {
+                    helper.setText(R.id.tvName, item.getName());
                     ImageView ivHeader = helper.getView(R.id.ivHeader);
-                    Glide.with(mContext).load(item.getPortraitUri()).centerCrop().into(ivHeader);
+                    Glide.with(mContext).load(item.getPortrait()).centerCrop().into(ivHeader);
 
                     String str = "";
                     //得到当前字母
-                    String currentLetter = item.getDisplayNameSpelling().charAt(0) + "";
+                    String currentLetter = PinyinUtils.getPinyin(item.getName()).charAt(0) + "";
                     if (position == 0) {
                         str = currentLetter;
                     } else {
                         //得到上一个字母
-                        String preLetter = mData.get(position - 1).getDisplayNameSpelling().charAt(0) + "";
+                        String preLetter = PinyinUtils.getPinyin(mData.get(position - 1).getName()).charAt(0) + "";
                         //如果和上一个字母的首字母不同则显示字母栏
                         if (!preLetter.equalsIgnoreCase(currentLetter)) {
                             str = currentLetter;
@@ -153,7 +148,7 @@ public class ContactsFgPresenter extends BasePresenter<IContactsFgView> {
                     int nextIndex = position + 1;
                     if (nextIndex < mData.size() - 1) {
                         //得到下一个字母
-                        String nextLetter = mData.get(nextIndex).getDisplayNameSpelling().charAt(0) + "";
+                        String nextLetter = PinyinUtils.getPinyin(mData.get(nextIndex).getName()).charAt(0) + "";
                         //如果和下一个字母的首字母不同则隐藏下划线
                         if (!nextLetter.equalsIgnoreCase(currentLetter)) {
                             helper.setViewVisibility(R.id.vLine, View.INVISIBLE);
@@ -183,7 +178,7 @@ public class ContactsFgPresenter extends BasePresenter<IContactsFgView> {
         }
         ((LQRAdapterForRecyclerView) mAdapter.getInnerAdapter()).setOnItemClickListener((lqrViewHolder, viewGroup, view, i) -> {
             Intent intent = new Intent(mContext, UserInfoActivity.class);
-            intent.putExtra("userInfo", DBManager.getInstance().getUserInfo(mData.get(i - 1).getUserId()));//-1是因为有头部
+            intent.putExtra("userInfo", mData.get(i - 1).getId());//-1是因为有头部
             mContext.jumpToActivity(intent);
         });
     }

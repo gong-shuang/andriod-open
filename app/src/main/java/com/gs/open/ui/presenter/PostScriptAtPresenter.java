@@ -3,19 +3,14 @@ package com.gs.open.ui.presenter;
 import com.gs.factory.common.data.DataSource;
 import com.gs.factory.data.helper.UserHelper;
 import com.gs.factory.model.card.UserCard;
-import com.gs.open.R;
-import com.gs.open.api.ApiRetrofit;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.IPostScriptAtView;
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.LogUtils;
+import com.gs.base.util.UIUtils;
 
 import net.qiujuer.genius.kit.handler.Run;
 import net.qiujuer.genius.kit.handler.runable.Action;
-
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 
 public class PostScriptAtPresenter extends BasePresenter<IPostScriptAtView> {

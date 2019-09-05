@@ -11,12 +11,12 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.gs.factory.persistence.Account;
-import com.gs.open.util.LogUtils;
+import com.gs.base.util.LogUtils;
 import com.jaeger.library.StatusBarUtil;
 import com.gs.open.R;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.UIUtils;
 
 import butterknife.BindView;
 import kr.co.namee.permissiongen.PermissionGen;

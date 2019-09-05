@@ -4,7 +4,7 @@ package com.gs.open.temp;
 import android.os.Parcel;
 import android.text.TextUtils;
 
-import com.gs.open.util.LogUtils;
+import com.gs.base.util.LogUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;

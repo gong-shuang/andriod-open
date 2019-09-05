@@ -17,15 +17,14 @@ import com.gs.factory.model.card.UserCard;
 import com.gs.factory.model.db.User;
 import com.gs.open.R;
 import com.gs.open.db.DBManager;
-import com.gs.open.db.model.Friend;
-import com.gs.open.temp.UserInfo;
+//import com.gs.open.db.model.Friend;
+//import com.gs.open.temp.UserInfo;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.presenter.SearchUserAtPresenter;
 import com.gs.open.ui.view.ISearchUserAtView;
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.PinyinUtils;
+import com.gs.base.util.PinyinUtils;
 import com.gs.open.util.SortUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.UIUtils;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;
 import com.lqr.recyclerview.LQRRecyclerView;
@@ -59,8 +58,8 @@ public class SearchUserActivity extends BaseActivity<ISearchUserAtView, SearchUs
     //查询到的好友
     @BindView(R.id.rvContacts)
     LQRRecyclerView mRvContacts;
-    private List<Friend> mData = new ArrayList<>();
-    private LQRAdapterForRecyclerView<Friend> mAdapter;
+    private List<User> mData = new ArrayList<>();
+    private LQRAdapterForRecyclerView<User> mAdapter;
 
 
     @Override
@@ -103,21 +102,20 @@ public class SearchUserActivity extends BaseActivity<ISearchUserAtView, SearchUs
 
     private void setAdapter() {
         if (mAdapter == null) {
-            mAdapter = new LQRAdapterForRecyclerView<Friend>(this, mData, R.layout.item_contact) {
+            mAdapter = new LQRAdapterForRecyclerView<User>(this, mData, R.layout.item_contact) {
                 @Override
-                public void convert(LQRViewHolderForRecyclerView helper, Friend item, int position) {
-                    helper.setText(R.id.tvName, item.getDisplayName());  //设置名字
+                public void convert(LQRViewHolderForRecyclerView helper, User item, int position) {
+                    helper.setText(R.id.tvName, item.getName());  //设置名字
                     ImageView ivHeader = helper.getView(R.id.ivHeader);   // 设置头像
-                    Glide.with(SearchUserActivity.this).load(item.getPortraitUri()).centerCrop().into(ivHeader);
+                    Glide.with(SearchUserActivity.this).load(item.getPortrait()).centerCrop().into(ivHeader);
 
                 }
             };
         }
         mAdapter.setOnItemClickListener((helper, parent, itemView, position) -> {
-            Friend item = mData.get(position);
-            UserInfo userInfo = new UserInfo(item.getUserId(), item.getName(), Uri.parse(item.getPortraitUri()));
+            User item = mData.get(position);
             Intent intent = new Intent(this, UserInfoActivity.class);
-            intent.putExtra("userInfo", userInfo);
+            intent.putExtra("userInfo", item.getId());
             jumpToActivity(intent);
         });
         mRvContacts.setAdapter(mAdapter);
@@ -153,29 +151,23 @@ public class SearchUserActivity extends BaseActivity<ISearchUserAtView, SearchUs
         UIUtils.showToast(str);
     }
 
+    /**
+     * 搜索用户，
+     * @param userCards
+     */
     @Override
     public void onSearchDone(List<UserCard> userCards){
         if (userCards != null && userCards.size() > 0) {
-            List<Friend> friends = new ArrayList<>();
-            for(UserCard user: userCards){
-                Friend friend = new Friend(
-                        user.getId(),
-                        user.getName(),
-                        user.getPortrait(),
-                        user.getName() ,
-                        null, user.getPhone(), null, null,
-                        PinyinUtils.getPinyin(user.getName()),
-                        PinyinUtils.getPinyin(user.getName())
-                );
-                if (TextUtils.isEmpty(friend.getPortraitUri())) {
-                    friend.setPortraitUri(DBManager.getInstance().getPortrait(friend));
-                }
-                friends.add(friend);
+            List<User> users = new ArrayList<>();
+            for(UserCard userCard: userCards){
+                User user = userCard.build();
+
+                users.add(user);
             }
             mData.clear();
-            mData.addAll(friends);
+            mData.addAll(users);
             //整理排序
-            SortUtils.sortContacts(friends);
+//            SortUtils.sortContacts(users);
 
             Run.onUiAsync(new Action() {
                 @Override

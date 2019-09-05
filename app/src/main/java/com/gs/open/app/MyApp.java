@@ -10,6 +10,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.gs.base.init.BaseApp;
 import com.gs.factory.Factory;
 import com.gs.open.push.AppMessageReceiverService;
 import com.gs.open.push.AppPushService;
@@ -19,7 +20,6 @@ import com.lqr.imagepicker.ImagePicker;
 import com.lqr.imagepicker.loader.ImageLoader;
 import com.lqr.imagepicker.view.CropImageView;
 
-import com.gs.factory.base.BaseApp;
 
 import org.litepal.LitePal;
 
@@ -27,7 +27,7 @@ import org.litepal.LitePal;
 /**
  *
  */
-public class MyApp extends BaseApp{
+public class MyApp extends BaseApp {
 
     @Override
     public void onCreate() {

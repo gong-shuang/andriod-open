@@ -17,20 +17,17 @@ import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRHeaderAndFooterAdapter;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;
 import com.gs.open.R;
-import com.gs.open.api.ApiRetrofit;
 import com.gs.open.db.DBManager;
 import com.gs.open.db.model.Friend;
-import com.gs.open.db.model.Groups;
-import com.gs.open.model.cache.UserCache;
-import com.gs.open.model.response.CreateGroupResponse;
+//import com.gs.open.db.model.Groups;
 import com.gs.open.ui.activity.CreateGroupActivity;
 import com.gs.open.ui.activity.SessionActivity;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.ICreateGroupAtView;
-import com.gs.open.util.LogUtils;
+import com.gs.base.util.LogUtils;
 import com.gs.open.util.SortUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.UIUtils;
 
 import net.qiujuer.genius.kit.handler.Run;
 import net.qiujuer.genius.kit.handler.runable.Action;
@@ -280,8 +277,8 @@ public class CreateGroupAtPresenter extends BasePresenter<ICreateGroupAtView> {
                 Run.onUiAsync(new Action() {
                     @Override
                     public void call() {
-                        DBManager.getInstance().saveOrUpdateGroup(new Groups(groupCard.getId(), groupCard.getName(), null,
-                                groupCard.getOwnerId().equals(Account.getUserId())?"0":"1"));
+//                        DBManager.getInstance().saveOrUpdateGroup(new Groups(groupCard.getId(), groupCard.getName(), null,
+//                                groupCard.getOwnerId().equals(Account.getUserId())?"0":"1"));
                         Intent intent = new Intent(mContext, SessionActivity.class);
                         intent.putExtra("sessionId", groupCard.getId());
                         intent.putExtra("sessionType", SessionActivity.SESSION_TYPE_GROUP);

@@ -57,6 +57,32 @@ public class MessageRepository extends BaseDbRepository<Message>
                 .execute();
     }
 
+    public void getDataByDB(final SucceedCallback<List<Message>> callback) {
+
+        Log.d("111", "receiverId:"+receiverId +",currentId:"+currentId );
+
+        // 接受 (sender_id == receiverId and group_id == null and message_receiver_id == currentId)
+        // 发送 or (sender_id == currentId) and  message_receiver_id == receiverId
+        SQLite.select()
+                .from(Message.class)
+                .where(OperatorGroup.clause()
+                        .and(Message_Table.sender_id.eq(receiverId))
+                        .and(Message_Table.group_id.isNull())
+                        .and(Message_Table.receiver_id.eq(currentId)))
+                .or(OperatorGroup.clause().and(Message_Table.sender_id.eq(currentId))
+                        .and(Message_Table.receiver_id.eq(receiverId)))
+                .orderBy(Message_Table.createAt, true)
+                .limit(30)
+                .async()
+                .queryListResultCallback(new QueryTransaction.QueryResultListCallback<Message>() {
+                    @Override
+                    public void onListQueryResult(QueryTransaction transaction, @NonNull List<Message> tResult) {
+                        if(callback != null)
+                            callback.onDataLoaded(tResult);
+                    }
+                }).execute();
+    }
+
     @Override
     protected boolean isRequired(Message message) {
         // receiverId 如果是发送者，那么Group==null情况下一定是发送给我的消息

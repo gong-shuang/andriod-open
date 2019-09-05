@@ -9,26 +9,28 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.gs.factory.common.data.DataSource;
 import com.gs.factory.data.helper.GroupHelper;
-import com.gs.factory.model.api.group.GroupCreateModel;
+import com.gs.factory.data.helper.UserHelper;
 import com.gs.factory.model.api.group.GroupMemberAddModel;
 import com.gs.factory.model.api.group.GroupMemberDelModel;
-import com.gs.factory.model.card.GroupCard;
 import com.gs.factory.model.card.GroupMemberCard;
 import com.gs.factory.model.card.GroupResponseCard;
+import com.gs.factory.model.db.Group;
+import com.gs.factory.model.db.GroupMember;
+import com.gs.factory.model.db.User;
 import com.gs.factory.persistence.Account;
 import com.gs.open.db.model.Friend;
-import com.gs.open.temp.Conversation;
-import com.gs.open.temp.UserInfo;
+//import com.gs.open.temp.Conversation;
+//import com.gs.open.temp.UserInfo;
+import com.gs.open.ui.UIGroupMember;
 import com.gs.open.ui.activity.MainActivity;
+import com.gs.open.ui.activity.SessionActivity;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;
 import com.gs.open.R;
 import com.gs.open.api.ApiRetrofit;
-import com.gs.open.app.AppConst;
 import com.gs.open.db.DBManager;
-import com.gs.open.db.model.GroupMember;
-import com.gs.open.db.model.Groups;
-import com.gs.open.manager.BroadcastManager;
+//import com.gs.open.db.model.GroupMember;
+//import com.gs.open.db.model.Groups;
 import com.gs.open.model.cache.UserCache;
 import com.gs.open.model.response.QuitGroupResponse;
 import com.gs.open.ui.activity.CreateGroupActivity;
@@ -38,9 +40,9 @@ import com.gs.open.ui.activity.UserInfoActivity;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.ISessionInfoAtView;
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.PinyinUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.LogUtils;
+import com.gs.base.util.PinyinUtils;
+import com.gs.base.util.UIUtils;
 import com.gs.open.widget.CustomDialog;
 
 import net.qiujuer.genius.kit.handler.Run;
@@ -63,18 +65,18 @@ import static com.gs.open.ui.activity.SessionActivity.SESSION_TYPE_PRIVATE;
 public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
 
 
-    private Conversation.ConversationType mConversationType;
+    private int mConversationType = SESSION_TYPE_PRIVATE;
     private String mSessionId;
-    private List<GroupMember> mData = new ArrayList<>();
-    private LQRAdapterForRecyclerView<GroupMember> mAdapter;
+    private List<UIGroupMember> mData = new ArrayList<>();
+    private LQRAdapterForRecyclerView<UIGroupMember> mAdapter;
     private boolean mIsManager = false;
     public boolean mIsCreateNewGroup = false;
     public String mDisplayName = "";
     private CustomDialog mSetDisplayNameDialog;
-    private Groups mGroups;
+//    private Groups mGroups;
     private Observable<QuitGroupResponse> quitGroupResponseObservable = null;
 
-    public SessionInfoAtPresenter(BaseActivity context, String sessionId, Conversation.ConversationType conversationType) {
+    public SessionInfoAtPresenter(BaseActivity context, String sessionId, int conversationType) {
         super(context);
         mSessionId = sessionId;
         mConversationType = conversationType;
@@ -86,36 +88,38 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
     }
 
     private void loadData() {
-        if (mConversationType == Conversation.ConversationType.PRIVATE) {
-            UserInfo userInfo = DBManager.getInstance().getUserInfo(mSessionId);
+        if (mConversationType == SESSION_TYPE_PRIVATE) {
+//            UserInfo userInfo = DBManager.getInstance().getUserInfo(mSessionId);
+            User userInfo = UserHelper.findFromLocal(mSessionId);
             if (userInfo != null) {
                 mData.clear();
-                GroupMember newMember = new GroupMember(mSessionId,
-                        userInfo.getUserId(),
-                        userInfo.getName(),
-                        userInfo.getPortraitUri().toString(),
-                        userInfo.getName(),
-                        PinyinUtils.getPinyin(userInfo.getName()),
-                        PinyinUtils.getPinyin(userInfo.getName()),
-                        "",
-                        "",
-                        "");
-                mData.add(newMember);
-                mData.add(new GroupMember("", "", ""));//+
+                UIGroupMember uiGroupMember = new UIGroupMember(userInfo.getId(), userInfo.getName(), userInfo.getPortrait());
+                mData.add(uiGroupMember);
+                mData.add(new UIGroupMember("", "", ""));// +
             }
             mIsCreateNewGroup = true;
         } else {
-            List<GroupMember> groupMembers = DBManager.getInstance().getGroupMembers(mSessionId);
+//            List<GroupMember> groupMembers = DBManager.getInstance().getGroupMembers(mSessionId);
+            List<GroupMember> groupMembers = GroupHelper.getMemberFromGroup(mSessionId);
             if (groupMembers != null && groupMembers.size() > 0) {
-                Groups groupsById = DBManager.getInstance().getGroupsById(mSessionId);
-                if (groupsById != null && groupsById.getRole().equals("0")) {
+//                Groups groupsById = DBManager.getInstance().getGroupsById(mSessionId);
+//                if (groupsById != null && groupsById.getRole().equals("0")) {
+//                    mIsManager = true;
+//                }
+                List<UIGroupMember> uiGroupMembers  = new ArrayList<>();
+                for(GroupMember groupMember : groupMembers){
+                    UIGroupMember uiGroupMember = new UIGroupMember(groupMember.getUser().getId(), groupMember.getUser().getName(),
+                            groupMember.getUser().getPortrait());
+                    uiGroupMembers.add(uiGroupMember);
+                }
+                if(GroupHelper.findFromLocal(mSessionId).getOwner().getId().equals(Account.getUserId())){
                     mIsManager = true;
                 }
                 mData.clear();
-                mData.addAll(groupMembers);
-                mData.add(new GroupMember("", "", ""));//+
+                mData.addAll(uiGroupMembers);
+                mData.add(new UIGroupMember("", "", ""));//+
                 if (mIsManager) {
-                    mData.add(new GroupMember("", "", ""));//-
+                    mData.add(new UIGroupMember("", "", ""));//-
                 }
             }
             mIsCreateNewGroup = false;
@@ -125,9 +129,9 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
 
     private void setAdapter() {
         if (mAdapter == null) {
-            mAdapter = new LQRAdapterForRecyclerView<GroupMember>(mContext, mData, R.layout.item_member_info) {
+            mAdapter = new LQRAdapterForRecyclerView<UIGroupMember>(mContext, mData, R.layout.item_member_info) {
                 @Override
-                public void convert(LQRViewHolderForRecyclerView helper, GroupMember item, int position) {
+                public void convert(LQRViewHolderForRecyclerView helper, UIGroupMember item, int position) {
                     ImageView ivHeader = helper.getView(R.id.ivHeader);
                     if (mIsManager && position >= mData.size() - 2) {//+和-
                         if (position == mData.size() - 2) {//+
@@ -140,7 +144,7 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
                         ivHeader.setImageResource(R.mipmap.ic_add_team_member);
                         helper.setText(R.id.tvName, "");
                     } else {
-                        Glide.with(mContext).load(item.getPortraitUri()).centerCrop().into(ivHeader);
+                        Glide.with(mContext).load(item.getPortrait()).centerCrop().into(ivHeader);
                         helper.setText(R.id.tvName, item.getName());
                     }
                 }
@@ -149,15 +153,15 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
                 if (mIsManager && position >= mData.size() - 2) {//+和-
                     //是群管理员
                     if (position == mData.size() - 2) {//+
-                        addMember(mConversationType == Conversation.ConversationType.GROUP);
+                        addMember(mConversationType == SESSION_TYPE_GROUP);
                     } else {//-
                         removeMember();
                     }
                 } else if (!mIsManager && position >= mData.size() - 1) {//+
                     //不是群管理员
-                    addMember(mConversationType == Conversation.ConversationType.GROUP);
+                    addMember(mConversationType == SESSION_TYPE_GROUP);
                 } else {
-                    seeUserInfo(DBManager.getInstance().getUserInfo(mData.get(position).getUserId()));
+                    seeUserInfo(mData.get(position).getId());
                 }
             });
             getView().getRvMember().setAdapter(mAdapter);
@@ -176,7 +180,7 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
             ArrayList<String> selectedTeamMemberAccounts = new ArrayList<>();
             String id;
             for (int i = 0; i < mData.size(); i++) {
-                id = mData.get(i).getUserId();
+                id = mData.get(i).getId();
                 //最后两个是“+” “—”
                 if(id != null){
                     selectedTeamMemberAccounts.add(id);
@@ -195,9 +199,9 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
         mContext.startActivityForResult(intent, SessionInfoActivity.REQ_REMOVE_MEMBERS);
     }
 
-    private void seeUserInfo(UserInfo userInfo) {
+    private void seeUserInfo(String id) {
         Intent intent = new Intent(mContext, UserInfoActivity.class);
-        intent.putExtra("userInfo", userInfo);
+        intent.putExtra("userInfo", id);
         mContext.jumpToActivity(intent);
     }
 
@@ -236,7 +240,7 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
 //                    }
 //                }, this::addMembersError);
 
-        if(selectedIds.size() == 0 || mConversationType == Conversation.ConversationType.PRIVATE)
+        if(selectedIds.size() == 0 || mConversationType == SESSION_TYPE_PRIVATE)
             return;
 
         Set<String> users = new HashSet<>();
@@ -263,7 +267,9 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
                 //更新本地保存的组信息
                 for(GroupMemberCard memberCard: groupMemberCards){
                     //保存到数据库
-                    DBManager.getInstance().saveOrUpdateGroupMember(toGroupMember(memberCard));
+//                    DBManager.getInstance().saveOrUpdateGroupMember(toGroupMember(memberCard));
+                    //数据库的操作，在请求网络的操作中执行了
+
                 }
                 //更新UI
                 loadData();
@@ -272,23 +278,23 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
     }
 
     //转化为GroupMember格式
-    private GroupMember toGroupMember(GroupMemberCard member){
-        Groups groups =  DBManager.getInstance().getGroupsById(member.getGroupId());
-        Friend friend =  DBManager.getInstance().getFriendById(member.getUserId());
-        if(groups == null || friend == null){
-            LogUtils.e("groups == null || friend == null");
-            return null;
-        }
-        GroupMember groupMember = new GroupMember(friend.getUserId(), friend.getName(), friend.getPortraitUri());
-        groupMember.setNameSpelling(PinyinUtils.getPinyin(friend.getName() == null ? "null" : friend.getName()));
-        groupMember.setDisplayName(member.getAlias());
-        groupMember.setDisplayNameSpelling(PinyinUtils.getPinyin(member.getAlias() == null ? "null" : member.getAlias()));
-        groupMember.setGroupId(member.getGroupId());
-        groupMember.setGroupName(groups.getName());
-        groupMember.setGroupNameSpelling(PinyinUtils.getPinyin(groups.getName() == null ? "null" : groups.getName()));
-        groupMember.setGroupPortrait(groups.getPortraitUri());
-        return groupMember;
-    }
+//    private GroupMember toGroupMember(GroupMemberCard member){
+//        Groups groups =  DBManager.getInstance().getGroupsById(member.getGroupId());
+//        Friend friend =  DBManager.getInstance().getFriendById(member.getUserId());
+//        if(groups == null || friend == null){
+//            LogUtils.e("groups == null || friend == null");
+//            return null;
+//        }
+//        GroupMember groupMember = new GroupMember(friend.getUserId(), friend.getName(), friend.getPortraitUri());
+//        groupMember.setNameSpelling(PinyinUtils.getPinyin(friend.getName() == null ? "null" : friend.getName()));
+//        groupMember.setDisplayName(member.getAlias());
+//        groupMember.setDisplayNameSpelling(PinyinUtils.getPinyin(member.getAlias() == null ? "null" : member.getAlias()));
+//        groupMember.setGroupId(member.getGroupId());
+//        groupMember.setGroupName(groups.getName());
+//        groupMember.setGroupNameSpelling(PinyinUtils.getPinyin(groups.getName() == null ? "null" : groups.getName()));
+//        groupMember.setGroupPortrait(groups.getPortraitUri());
+//        return groupMember;
+//    }
 
     public void deleteGroupMembers(ArrayList<String> selectedIds) {
 //        mContext.showWaitingDialog(UIUtils.getString(R.string.please_wait));
@@ -318,7 +324,7 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
 //                    }
 //                }, this::delMembersError);
 
-        if(selectedIds.size() == 0 || mConversationType == Conversation.ConversationType.PRIVATE)
+        if(selectedIds.size() == 0 || mConversationType == SESSION_TYPE_PRIVATE)
             return;
 
         Set<String> users = new HashSet<>();
@@ -345,7 +351,7 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
                 //更新本地保存的组信息
                 for(GroupMemberCard memberCard: groupMemberCards){
                     //保存到数据库
-                    DBManager.getInstance().deleteGroupMembers(toGroupMember(memberCard));
+//                    DBManager.getInstance().deleteGroupMembers(toGroupMember(memberCard));
                 }
                 //更新UI
                 loadData();
@@ -372,22 +378,22 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
 
                 break;
             case SESSION_TYPE_GROUP:
-                Observable.just(DBManager.getInstance().getGroupsById(sessionId))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(groups -> {
-                            if (groups == null)
-                                return;
-                            mGroups = groups;
-                            //设置群信息
-                            getView().getOivGroupName().setRightText(groups.getName());
-                            mDisplayName = TextUtils.isEmpty(groups.getDisplayName()) ?
-                                    DBManager.getInstance().getUserInfo(UserCache.getId()).getName() :
-                                    groups.getDisplayName();
-                            getView().getOivNickNameInGroup().setRightText(mDisplayName);
-                            getView().getBtnQuit().setText(groups.getRole().equals("0") ? UIUtils.getString(R.string.dismiss_this_group) :
-                                    UIUtils.getString(R.string.delete_and_exit));
-                        }, this::loadOtherError);
+//                Observable.just(DBManager.getInstance().getGroupsById(sessionId))
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe(groups -> {
+//                            if (groups == null)
+//                                return;
+//                            mGroups = groups;
+//                            //设置群信息
+//                            getView().getOivGroupName().setRightText(groups.getName());
+//                            mDisplayName = TextUtils.isEmpty(groups.getDisplayName()) ?
+//                                    DBManager.getInstance().getUserInfo(UserCache.getId()).getName() :
+//                                    groups.getDisplayName();
+//                            getView().getOivNickNameInGroup().setRightText(mDisplayName);
+//                            getView().getBtnQuit().setText(groups.getRole().equals("0") ? UIUtils.getString(R.string.dismiss_this_group) :
+//                                    UIUtils.getString(R.string.delete_and_exit));
+//                        }, this::loadOtherError);
                 break;
         }
     }
@@ -410,17 +416,17 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
 
     //退出该群
     public void quit() {
-        if (mGroups == null)
-            return;
-        String tip = "";
-        if (mGroups.getRole().equalsIgnoreCase("0")) {
-            tip = UIUtils.getString(R.string.are_you_sure_to_dismiss_this_group);
-            quitGroupResponseObservable = ApiRetrofit.getInstance().dissmissGroup(mSessionId);
-        } else {
-            tip = UIUtils.getString(R.string.you_will_never_receive_any_msg_after_quit);
-            quitGroupResponseObservable = ApiRetrofit.getInstance().quitGroup(mSessionId);
-        }
-        mContext.showMaterialDialog(null, tip, UIUtils.getString(R.string.sure), UIUtils.getString(R.string.cancel)
+//        if (mGroups == null)
+//            return;
+//        String tip = "";
+//        if (mGroups.getRole().equalsIgnoreCase("0")) {
+//            tip = UIUtils.getString(R.string.are_you_sure_to_dismiss_this_group);
+//            quitGroupResponseObservable = ApiRetrofit.getInstance().dissmissGroup(mSessionId);
+//        } else {
+//            tip = UIUtils.getString(R.string.you_will_never_receive_any_msg_after_quit);
+//            quitGroupResponseObservable = ApiRetrofit.getInstance().quitGroup(mSessionId);
+//        }
+//        mContext.showMaterialDialog(null, tip, UIUtils.getString(R.string.sure), UIUtils.getString(R.string.cancel)
 //                , v -> quitGroupResponseObservable
 //                        .subscribeOn(Schedulers.io())
 //                        .observeOn(AndroidSchedulers.mainThread())
@@ -458,15 +464,15 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
 //                                UIUtils.showToast(UIUtils.getString(R.string.exit_group_fail));
 //                            }
 //                        }, this::quitError)
-                , v ->quitGroupSendRequest()
-                , v -> mContext.hideMaterialDialog());
+//                , v ->quitGroupSendRequest()
+//                , v -> mContext.hideMaterialDialog());
     }
 
     //发送网络请求
     void quitGroupSendRequest(){
         mContext.hideMaterialDialog();
 
-        if(mConversationType == Conversation.ConversationType.PRIVATE)
+        if(mConversationType == SESSION_TYPE_PRIVATE)
             return;
 
         // 进行网络请求
@@ -554,13 +560,13 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(setGroupDisplayNameResponse -> {
                             if (setGroupDisplayNameResponse != null && setGroupDisplayNameResponse.getCode() == 200) {
-                                Groups groups = DBManager.getInstance().getGroupsById(mSessionId);
-                                if (groups != null) {
-                                    groups.setDisplayName(displayName);
-                                    groups.saveOrUpdate("groupid=?", groups.getGroupId());
-                                    mDisplayName = displayName;
-                                    getView().getOivNickNameInGroup().setRightText(mDisplayName);
-                                }
+//                                Groups groups = DBManager.getInstance().getGroupsById(mSessionId);
+//                                if (groups != null) {
+//                                    groups.setDisplayName(displayName);
+//                                    groups.saveOrUpdate("groupid=?", groups.getGroupId());
+//                                    mDisplayName = displayName;
+//                                    getView().getOivNickNameInGroup().setRightText(mDisplayName);
+//                                }
                                 UIUtils.showToast(UIUtils.getString(R.string.change_success));
                             } else {
                                 UIUtils.showToast(UIUtils.getString(R.string.change_fail));

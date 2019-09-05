@@ -16,8 +16,10 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.gs.factory.data.helper.UserHelper;
+import com.gs.factory.model.db.User;
 import com.gs.factory.persistence.Account;
-import com.gs.open.temp.UserInfo;
+//import com.gs.open.temp.UserInfo;
 import com.lqr.optionitemview.OptionItemView;
 import com.gs.open.R;
 import com.gs.open.api.ApiRetrofit;
@@ -27,8 +29,8 @@ import com.gs.open.db.model.Friend;
 import com.gs.open.manager.BroadcastManager;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.LogUtils;
+import com.gs.base.util.UIUtils;
 
 import butterknife.BindView;
 import rx.android.schedulers.AndroidSchedulers;
@@ -40,7 +42,8 @@ import rx.schedulers.Schedulers;
  */
 public class UserInfoActivity extends BaseActivity {
 
-    UserInfo mUserInfo;
+    User mUserInfo;
+    String userID;
 
     @BindView(R.id.ibToolbarMore)
     ImageButton mIbToolbarMore;
@@ -80,18 +83,20 @@ public class UserInfoActivity extends BaseActivity {
     OptionItemView mOivAlias;
     @BindView(R.id.oivDelete)
     OptionItemView mOivDelete;
-    private Friend mFriend;
+//    private Friend mFriend;
 
     @Override
     public void init() {
         Intent intent = getIntent();
-        mUserInfo = intent.getExtras().getParcelable("userInfo");
+        userID = intent.getStringExtra("userInfo");
+        mUserInfo = UserHelper.findFromLocal(userID);
  //       registerBR();
     }
 
     @Override
     public void initView() {
         if (mUserInfo == null) {
+            LogUtils.e("mUserInfo id:" + mUserInfo + " not exist!");
             finish();
             return;
         }
@@ -101,35 +106,31 @@ public class UserInfoActivity extends BaseActivity {
 
     @Override
     public void initData() {
-        mFriend = DBManager.getInstance().getFriendById(mUserInfo.getUserId());
+ //       mFriend = DBManager.getInstance().getFriendById(mUserInfo.getId());
         Glide.with(this).load(DBManager.getInstance().getPortraitUri(mUserInfo)).centerCrop().into(mIvHeader);
         mTvAccount.setText(UIUtils.getString(R.string.my_chat_account, Account.getUser().getPhone()));
         mTvName.setText(mUserInfo.getName());
 
-        if (mFriend == null) {//陌生人
+        if(mUserInfo.getRole() == User.ROLE_FRIEND){
+            String nickName = mUserInfo.getName();
+            mTvName.setText(nickName);
+            if (TextUtils.isEmpty(nickName)) {
+                mTvNickName.setVisibility(View.INVISIBLE);
+            } else {
+                mTvNickName.setText(UIUtils.getString(R.string.nickname_colon, mUserInfo.getName()));
+            }
+        }else if(mUserInfo.getRole() == User.ROLE_STRANGER){
             mBtnCheat.setVisibility(View.GONE);
             mBtnAddToContact.setVisibility(View.VISIBLE);
             mTvNickName.setVisibility(View.INVISIBLE);
-        } else {
-            if (mFriend.getUserId() == Account.getUserId()) {//我
-                mTvNickName.setVisibility(View.INVISIBLE);
-                mOivAliasAndTag.setVisibility(View.GONE);
-                mLlArea.setVisibility(View.GONE);
-                mLlSignature.setVisibility(View.GONE);
-                mBtnCheat.setVisibility(View.GONE);  // 是我的消息的时候，这个按钮也屏蔽，不允许自己给自己发消息。
-            } else if (DBManager.getInstance().isMyFriend(mFriend.getUserId())) {//我的朋友
-                String nickName = mFriend.getDisplayName();
-                mTvName.setText(nickName);
-                if (TextUtils.isEmpty(nickName)) {
-                    mTvNickName.setVisibility(View.INVISIBLE);
-                } else {
-                    mTvNickName.setText(UIUtils.getString(R.string.nickname_colon, mFriend.getName()));
-                }
-            } else {//陌生人
-                mBtnCheat.setVisibility(View.GONE);
-                mBtnAddToContact.setVisibility(View.VISIBLE);
-                mTvNickName.setVisibility(View.INVISIBLE);
-            }
+        }else if(mUserInfo.getRole() == User.ROLE_SELF){
+            mTvNickName.setVisibility(View.INVISIBLE);
+            mOivAliasAndTag.setVisibility(View.GONE);
+            mLlArea.setVisibility(View.GONE);
+            mLlSignature.setVisibility(View.GONE);
+            mBtnCheat.setVisibility(View.GONE);  // 是我的消息的时候，这个按钮也屏蔽，不允许自己给自己发消息。
+        }else{
+            //错误
         }
     }
 
@@ -140,7 +141,7 @@ public class UserInfoActivity extends BaseActivity {
 
         mBtnCheat.setOnClickListener(v -> {
             Intent intent = new Intent(UserInfoActivity.this, SessionActivity.class);   // 跳转到聊天界面。
-            intent.putExtra("sessionId", mUserInfo.getUserId());
+            intent.putExtra("sessionId", mUserInfo.getId());
             intent.putExtra("sessionType", SessionActivity.SESSION_TYPE_PRIVATE);
             jumpToActivity(intent);
             finish();
@@ -149,7 +150,7 @@ public class UserInfoActivity extends BaseActivity {
         mBtnAddToContact.setOnClickListener(v -> {
             //跳转到写附言界面
             Intent intent = new Intent(UserInfoActivity.this, PostScriptActivity.class);
-            intent.putExtra("userId", mUserInfo.getUserId());
+            intent.putExtra("userId", mUserInfo.getId());
             jumpToActivity(intent);
         });
 
@@ -161,50 +162,50 @@ public class UserInfoActivity extends BaseActivity {
         });
         mOivDelete.setOnClickListener(v -> {
             hideMenu();
-            showMaterialDialog(UIUtils.getString(R.string.delete_contact),
-                    UIUtils.getString(R.string.delete_contact_content, mUserInfo.getName()),
-                    UIUtils.getString(R.string.delete),
-                    UIUtils.getString(R.string.cancel),
-                    v1 -> ApiRetrofit.getInstance()
-                            .deleteFriend(mUserInfo.getUserId())
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(deleteFriendResponse -> {
-                                hideMaterialDialog();
-                                if (deleteFriendResponse.getCode() == 200) {
-//                                    RongIMClient.getInstance().getConversation(Conversation.ConversationType.PRIVATE, mUserInfo.getUserId(), new RongIMClient.ResultCallback<Conversation>() {
-//                                        @Override
-//                                        public void onSuccess(Conversation conversation) {
-//                                            RongIMClient.getInstance().clearMessages(Conversation.ConversationType.PRIVATE, mUserInfo.getUserId(), new RongIMClient.ResultCallback<Boolean>() {
-//                                                @Override
-//                                                public void onSuccess(Boolean aBoolean) {
-//                                                    RongIMClient.getInstance().removeConversation(Conversation.ConversationType.PRIVATE, mUserInfo.getUserId(), null);
-//                                                }
-//
-//                                                @Override
-//                                                public void onError(RongIMClient.ErrorCode errorCode) {
-//
-//                                                }
-//                                            });
-//                                        }
-//
-//                                        @Override
-//                                        public void onError(RongIMClient.ErrorCode errorCode) {
-//
-//                                        }
-//                                    });
-                                    //通知对方被删除(把我的id发给对方)
-//                                    DeleteContactMessage deleteContactMessage = DeleteContactMessage.obtain(UserCache.getId());
-//                                    RongIMClient.getInstance().sendMessage(Message.obtain(mUserInfo.getUserId(), Conversation.ConversationType.PRIVATE, deleteContactMessage), "", "", null, null);
-                                    DBManager.getInstance().deleteFriendById(mUserInfo.getUserId());
-                                    UIUtils.showToast(UIUtils.getString(R.string.delete_success));
-                                    BroadcastManager.getInstance(UserInfoActivity.this).sendBroadcast(AppConst.UPDATE_FRIEND);
-                                    finish();
-                                } else {
-                                    UIUtils.showToast(UIUtils.getString(R.string.delete_fail));
-                                }
-                            }, this::loadError)
-                    , v2 -> hideMaterialDialog());
+//            showMaterialDialog(UIUtils.getString(R.string.delete_contact),
+//                    UIUtils.getString(R.string.delete_contact_content, mUserInfo.getName()),
+//                    UIUtils.getString(R.string.delete),
+//                    UIUtils.getString(R.string.cancel),
+//                    v1 -> ApiRetrofit.getInstance()
+//                            .deleteFriend(mUserInfo.getUserId())
+//                            .subscribeOn(Schedulers.io())
+//                            .observeOn(AndroidSchedulers.mainThread())
+//                            .subscribe(deleteFriendResponse -> {
+//                                hideMaterialDialog();
+//                                if (deleteFriendResponse.getCode() == 200) {
+////                                    RongIMClient.getInstance().getConversation(Conversation.ConversationType.PRIVATE, mUserInfo.getUserId(), new RongIMClient.ResultCallback<Conversation>() {
+////                                        @Override
+////                                        public void onSuccess(Conversation conversation) {
+////                                            RongIMClient.getInstance().clearMessages(Conversation.ConversationType.PRIVATE, mUserInfo.getUserId(), new RongIMClient.ResultCallback<Boolean>() {
+////                                                @Override
+////                                                public void onSuccess(Boolean aBoolean) {
+////                                                    RongIMClient.getInstance().removeConversation(Conversation.ConversationType.PRIVATE, mUserInfo.getUserId(), null);
+////                                                }
+////
+////                                                @Override
+////                                                public void onError(RongIMClient.ErrorCode errorCode) {
+////
+////                                                }
+////                                            });
+////                                        }
+////
+////                                        @Override
+////                                        public void onError(RongIMClient.ErrorCode errorCode) {
+////
+////                                        }
+////                                    });
+//                                    //通知对方被删除(把我的id发给对方)
+////                                    DeleteContactMessage deleteContactMessage = DeleteContactMessage.obtain(UserCache.getId());
+////                                    RongIMClient.getInstance().sendMessage(Message.obtain(mUserInfo.getUserId(), Conversation.ConversationType.PRIVATE, deleteContactMessage), "", "", null, null);
+//                                    DBManager.getInstance().deleteFriendById(mUserInfo.getUserId());
+//                                    UIUtils.showToast(UIUtils.getString(R.string.delete_success));
+//                                    BroadcastManager.getInstance(UserInfoActivity.this).sendBroadcast(AppConst.UPDATE_FRIEND);
+//                                    finish();
+//                                } else {
+//                                    UIUtils.showToast(UIUtils.getString(R.string.delete_fail));
+//                                }
+//                            }, this::loadError)
+//                    , v2 -> hideMaterialDialog());
         });
     }
 
@@ -221,7 +222,7 @@ public class UserInfoActivity extends BaseActivity {
 
     private void jumpToSetAlias() {
         Intent intent = new Intent(this, SetAliasActivity.class);
-        intent.putExtra("userId", mUserInfo.getUserId());
+        intent.putExtra("userId", mUserInfo.getId());
         jumpToActivity(intent);
     }
 
@@ -255,13 +256,13 @@ public class UserInfoActivity extends BaseActivity {
     }
 
     private void registerBR() {
-        BroadcastManager.getInstance(this).register(AppConst.CHANGE_INFO_FOR_USER_INFO, new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                mUserInfo = DBManager.getInstance().getUserInfo(mUserInfo.getUserId());
-                initData();
-            }
-        });
+//        BroadcastManager.getInstance(this).register(AppConst.CHANGE_INFO_FOR_USER_INFO, new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                mUserInfo = DBManager.getInstance().getUserInfo(mUserInfo.getUserId());
+//                initData();
+//            }
+//        });
     }
 
     private void unRegisterBR() {

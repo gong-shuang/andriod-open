@@ -13,7 +13,7 @@ import com.gs.open.R;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.presenter.RegisterAtPresenter;
 import com.gs.open.ui.view.IRegisterAtView;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.UIUtils;
 
 import butterknife.BindView;
 

@@ -19,10 +19,17 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.gs.open.temp.Conversation;
-import com.gs.open.temp.Message;
-import com.gs.open.temp.UserInfo;
-import com.gs.open.util.LogUtils;
+//import com.gs.open.temp.Conversation;
+//import com.gs.open.temp.Message;
+//import com.gs.open.temp.UserInfo;
+import com.gs.base.util.LogUtils;
+//import com.gs.open.temp.Message;
+import com.gs.factory.data.helper.GroupHelper;
+import com.gs.factory.data.helper.UserHelper;
+import com.gs.factory.model.db.Group;
+import com.gs.factory.model.db.GroupMember;
+import com.gs.factory.model.db.Message;
+import com.gs.factory.model.db.User;
 import com.lqr.audio.AudioRecordManager;
 import com.lqr.audio.IAudioRecordListener;
 import com.lqr.emoji.EmotionKeyboard;
@@ -37,18 +44,17 @@ import com.lqr.recyclerview.LQRRecyclerView;
 import com.gs.open.R;
 import com.gs.open.app.AppConst;
 import com.gs.open.db.DBManager;
-import com.gs.open.db.model.Groups;
+//import com.gs.open.db.model.Groups;
 import com.gs.open.manager.BroadcastManager;
 import com.gs.open.model.data.LocationData;
 import com.gs.open.ui.base.BaseFragmentActivity;
-import com.gs.open.ui.presenter.SessionAtPresenter;
+import com.gs.open.ui.presenter.UiSessionAtPresenter;
 import com.gs.open.ui.view.ISessionAtView;
-import com.gs.open.util.ImageUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.ImageUtils;
+import com.gs.base.util.UIUtils;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -60,7 +66,7 @@ import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
  * @创建者 CSDN_LQR
  * @描述 会话界面（单聊、群聊）
  */
-public class SessionActivity extends BaseFragmentActivity<ISessionAtView, SessionAtPresenter> implements ISessionAtView, IEmotionSelectedListener, BGARefreshLayout.BGARefreshLayoutDelegate {
+public class SessionActivity extends BaseFragmentActivity<ISessionAtView, UiSessionAtPresenter> implements ISessionAtView, IEmotionSelectedListener, BGARefreshLayout.BGARefreshLayoutDelegate {
 
     public static final int REQUEST_IMAGE_PICKER = 1000;
     public final static int REQUEST_TAKE_PHOTO = 1001;
@@ -71,7 +77,7 @@ public class SessionActivity extends BaseFragmentActivity<ISessionAtView, Sessio
 
     private String mSessionId = "";   // 就是用户的ID
     private boolean mIsFirst = false;
-    private Conversation.ConversationType mConversationType = Conversation.ConversationType.PRIVATE;
+    private int mConversationType = Message.RECEIVER_TYPE_NONE;
 
     @BindView(R.id.ibToolbarMore)
     ImageButton mIbToolbarMore;
@@ -123,10 +129,10 @@ public class SessionActivity extends BaseFragmentActivity<ISessionAtView, Sessio
         int sessionType = intent.getIntExtra("sessionType", SESSION_TYPE_PRIVATE);
         switch (sessionType) {
             case SESSION_TYPE_PRIVATE:
-                mConversationType = Conversation.ConversationType.PRIVATE;
+                mConversationType = Message.RECEIVER_TYPE_NONE;
                 break;
             case SESSION_TYPE_GROUP:
-                mConversationType = Conversation.ConversationType.GROUP;
+                mConversationType = Message.RECEIVER_TYPE_GROUP;
                 break;
         }
 
@@ -149,16 +155,19 @@ public class SessionActivity extends BaseFragmentActivity<ISessionAtView, Sessio
     }
 
     private void setTitle() {
-        if (mConversationType == Conversation.ConversationType.PRIVATE) {
-            UserInfo userInfo = DBManager.getInstance().getUserInfo(mSessionId);
-            if (userInfo != null)
-                setToolbarTitle(userInfo.getName());
-        } else if (mConversationType == Conversation.ConversationType.GROUP) {
-            List<Groups> groupsList = DBManager.getInstance().getGroups();
-            LogUtils.e("groupsList:" + groupsList.size());
-            Groups groups = DBManager.getInstance().getGroupsById(mSessionId);
-            if (groups != null)
-                setToolbarTitle(groups.getName());
+        if (mConversationType == Message.RECEIVER_TYPE_NONE) {
+//            UserInfo userInfo = DBManager.getInstance().getUserInfo(mSessionId);
+            User user = UserHelper.findFromLocal(mSessionId);
+            if (user != null)
+                setToolbarTitle(user.getName());
+        } else if (mConversationType == Message.RECEIVER_TYPE_GROUP) {
+//            List<Groups> groupsList = DBManager.getInstance().getGroups();
+            List<GroupMember> groupMembers = GroupHelper.getMemberFromGroup(mSessionId);
+            LogUtils.e("groupsList:" + groupMembers.size());
+ //           Groups groups = DBManager.getInstance().getGroupsById(mSessionId);
+            Group group = GroupHelper.findFromLocal(mSessionId);
+            if (group != null)
+                setToolbarTitle(group.getName());
         }
     }
 
@@ -172,7 +181,7 @@ public class SessionActivity extends BaseFragmentActivity<ISessionAtView, Sessio
         mIbToolbarMore.setOnClickListener(v -> {
             Intent intent = new Intent(SessionActivity.this, SessionInfoActivity.class);
             intent.putExtra("sessionId", mSessionId);
-            intent.putExtra("sessionType", mConversationType == mConversationType.PRIVATE ? SessionActivity.SESSION_TYPE_PRIVATE : SessionActivity.SESSION_TYPE_GROUP);
+            intent.putExtra("sessionType", mConversationType == Message.RECEIVER_TYPE_NONE ? SessionActivity.SESSION_TYPE_PRIVATE : SessionActivity.SESSION_TYPE_GROUP);
             jumpToActivity(intent);
         });
         mElEmotion.setEmotionSelectedListener(this);
@@ -265,18 +274,22 @@ public class SessionActivity extends BaseFragmentActivity<ISessionAtView, Sessio
             return false;
         });
 
+        //图片
         mRlAlbum.setOnClickListener(v -> {
             Intent intent = new Intent(this, ImageGridActivity.class);
             startActivityForResult(intent, REQUEST_IMAGE_PICKER);
         });
+        //拍照
         mRlTakePhoto.setOnClickListener(v -> {
             Intent intent = new Intent(SessionActivity.this, TakePhotoActivity.class);
             startActivityForResult(intent, REQUEST_TAKE_PHOTO);
         });
+        //位置
         mRlLocation.setOnClickListener(v -> {
             Intent intent = new Intent(SessionActivity.this, MyLocationActivity.class);
             startActivityForResult(intent, REQUEST_MY_LOCATION);
         });
+        //红包
         mRlRedPacket.setOnClickListener(v -> mPresenter.sendRedPacketMsg());
     }
 
@@ -458,9 +471,11 @@ public class SessionActivity extends BaseFragmentActivity<ISessionAtView, Sessio
                         }
                     }
                 }
+                break;  //gs-add
             case REQUEST_TAKE_PHOTO:
                 if (resultCode == RESULT_OK) {
                     String path = data.getStringExtra("path");
+                    LogUtils.d("path:" + path);
                     if (data.getBooleanExtra("take_photo", true)) {
                         //照片
                         mPresenter.sendImgMsg(ImageUtils.genThumbImgFile(path), new File(path));
@@ -495,35 +510,35 @@ public class SessionActivity extends BaseFragmentActivity<ISessionAtView, Sessio
     }
 
     private void registerBR() {
-        BroadcastManager.getInstance(this).register(AppConst.UPDATE_CURRENT_SESSION, new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Message message = intent.getParcelableExtra("result");
-                if (message != null) {
-                    if (message.getTargetId().equals(mSessionId)) {
-                        mPresenter.receiveNewMessage(message);
-                    }
-                }
-            }
-        });
-        BroadcastManager.getInstance(this).register(AppConst.REFRESH_CURRENT_SESSION, new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                mPresenter.loadMessage();
-            }
-        });
-        BroadcastManager.getInstance(this).register(AppConst.UPDATE_CURRENT_SESSION_NAME, new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                setTitle();
-            }
-        });
-        BroadcastManager.getInstance(this).register(AppConst.CLOSE_CURRENT_SESSION, new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                finish();
-            }
-        });
+//        BroadcastManager.getInstance(this).register(AppConst.UPDATE_CURRENT_SESSION, new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                Message message = intent.getParcelableExtra("result");
+//                if (message != null) {
+//                    if (message.getTargetId().equals(mSessionId)) {
+//                        mPresenter.receiveNewMessage(message);
+//                    }
+//                }
+//            }
+//        });
+//        BroadcastManager.getInstance(this).register(AppConst.REFRESH_CURRENT_SESSION, new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                mPresenter.loadMessage();
+//            }
+//        });
+//        BroadcastManager.getInstance(this).register(AppConst.UPDATE_CURRENT_SESSION_NAME, new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                setTitle();
+//            }
+//        });
+//        BroadcastManager.getInstance(this).register(AppConst.CLOSE_CURRENT_SESSION, new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                finish();
+//            }
+//        });
 
     }
 
@@ -651,8 +666,8 @@ public class SessionActivity extends BaseFragmentActivity<ISessionAtView, Sessio
     }
 
     @Override
-    protected SessionAtPresenter createPresenter() {
-        return new SessionAtPresenter(this, mSessionId, mConversationType);
+    protected UiSessionAtPresenter createPresenter() {
+        return new UiSessionAtPresenter(this, mSessionId, mConversationType);
     }
 
     @Override

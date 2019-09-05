@@ -32,17 +32,25 @@ public class SessionRepository extends BaseDbRepository<Session>
                 .async()
                 .queryListResultCallback(this)   // 设置查询结果的回调
                 .execute();
+    }
 
-        //10
-        //9
-        //8
-
-        // 复写insert之后导致的问题
-
-        // 8
-        // 9
-        // 10
-
+    @Override
+    public void getDataByDB(final SucceedCallback<List<Session>> callback) {
+        // 数据库查询
+        SQLite.select()
+                .from(Session.class)
+                .orderBy(Session_Table.modifyAt, false) // false 是倒序
+                .limit(100)
+                .async()
+                .queryListResultCallback(new QueryTransaction.QueryResultListCallback<Session>() {
+                    @Override
+                    public void onListQueryResult(QueryTransaction transaction, @NonNull List<Session> tResult) {
+                        if(callback != null){
+                            callback.onDataLoaded(tResult);
+                        }
+                    }
+                })   // 设置查询结果的回调
+                .execute();
     }
 
     @Override

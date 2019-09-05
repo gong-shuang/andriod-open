@@ -8,12 +8,8 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.gs.factory.common.data.DataSource;
 import com.gs.factory.data.helper.UserHelper;
-import com.gs.factory.model.card.UserCard;
 import com.gs.factory.model.db.User;
-import com.gs.factory.persistence.Account;
-import com.gs.open.temp.UserInfo;
-import com.gs.open.util.PinyinUtils;
-import com.gs.open.util.SortUtils;
+//import com.gs.open.temp.UserInfo;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;
 import com.gs.open.R;
@@ -30,9 +26,9 @@ import com.gs.open.model.response.UserRelationshipResponse;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.INewFriendAtView;
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.NetUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.LogUtils;
+import com.gs.base.util.NetUtils;
+import com.gs.base.util.UIUtils;
 
 import net.qiujuer.genius.kit.handler.Run;
 import net.qiujuer.genius.kit.handler.runable.Action;
@@ -113,7 +109,8 @@ public class NewFriendAtPresenter extends BasePresenter<INewFriendAtView> {
                         userEntity.setPortraitUri(user.getPortrait());
                         UserRelationshipResponse.ResultEntity Result = new UserRelationshipResponse.ResultEntity(
                                 user.getName(),"你好！",
-                                DBManager.getInstance().getUserInfo(user.getId()) == null ? 11 : 20,
+//                                DBManager.getInstance().getUserInfo(user.getId()) == null ? 11 : 20,
+                                UserHelper.findFromLocal(user.getId()) == null?  11 : 20,
                                 user.getModifyAt().toString(),userEntity);
 
                         ResultList.add(Result);
@@ -193,35 +190,35 @@ public class NewFriendAtPresenter extends BasePresenter<INewFriendAtView> {
             UIUtils.showToast(UIUtils.getString(R.string.please_check_net));
             return;
         }
-        ApiRetrofit.getInstance().agreeFriends(friendId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .flatMap(new Func1<AgreeFriendsResponse, Observable<GetUserInfoByIdResponse>>() {
-                    @Override
-                    public Observable<GetUserInfoByIdResponse> call(AgreeFriendsResponse agreeFriendsResponse) {
-                        if (agreeFriendsResponse != null && agreeFriendsResponse.getCode() == 200) {
-                            helper.setViewVisibility(R.id.tvAdded, View.VISIBLE)
-                                    .setViewVisibility(R.id.btnAck, View.GONE);
-                            return ApiRetrofit.getInstance().getUserInfoById(friendId);
-                        }
-                        return Observable.error(new ServerException(UIUtils.getString(R.string.agree_friend_fail)));
-                    }
-                })
-                .subscribe(getUserInfoByIdResponse -> {
-                    if (getUserInfoByIdResponse != null && getUserInfoByIdResponse.getCode() == 200) {
-                        GetUserInfoByIdResponse.ResultEntity result = getUserInfoByIdResponse.getResult();
-                        UserInfo userInfo = new UserInfo(UserCache.getId(), result.getNickname(), Uri.parse(result.getPortraitUri()));
-                        if (TextUtils.isEmpty(userInfo.getPortraitUri().toString())) {
-                            userInfo.setPortraitUri(Uri.parse(DBManager.getInstance().getPortraitUri(userInfo)));
-                        }
-                        Friend friend = new Friend(userInfo.getUserId(), userInfo.getName(), userInfo.getPortraitUri().toString());
-                        DBManager.getInstance().saveOrUpdateFriend(friend);
-                        UIUtils.postTaskDelay(() -> {
-                            BroadcastManager.getInstance(UIUtils.getContext()).sendBroadcast(AppConst.UPDATE_FRIEND);
-                            BroadcastManager.getInstance(UIUtils.getContext()).sendBroadcast(AppConst.UPDATE_CONVERSATIONS);
-                        }, 1000);
-                    }
-                }, this::loadError);
+//        ApiRetrofit.getInstance().agreeFriends(friendId)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .flatMap(new Func1<AgreeFriendsResponse, Observable<GetUserInfoByIdResponse>>() {
+//                    @Override
+//                    public Observable<GetUserInfoByIdResponse> call(AgreeFriendsResponse agreeFriendsResponse) {
+//                        if (agreeFriendsResponse != null && agreeFriendsResponse.getCode() == 200) {
+//                            helper.setViewVisibility(R.id.tvAdded, View.VISIBLE)
+//                                    .setViewVisibility(R.id.btnAck, View.GONE);
+//                            return ApiRetrofit.getInstance().getUserInfoById(friendId);
+//                        }
+//                        return Observable.error(new ServerException(UIUtils.getString(R.string.agree_friend_fail)));
+//                    }
+//                })
+//                .subscribe(getUserInfoByIdResponse -> {
+//                    if (getUserInfoByIdResponse != null && getUserInfoByIdResponse.getCode() == 200) {
+//                        GetUserInfoByIdResponse.ResultEntity result = getUserInfoByIdResponse.getResult();
+//                        UserInfo userInfo = new UserInfo(UserCache.getId(), result.getNickname(), Uri.parse(result.getPortraitUri()));
+//                        if (TextUtils.isEmpty(userInfo.getPortraitUri().toString())) {
+//                            userInfo.setPortraitUri(Uri.parse(DBManager.getInstance().getPortraitUri(userInfo)));
+//                        }
+//                        Friend friend = new Friend(userInfo.getUserId(), userInfo.getName(), userInfo.getPortraitUri().toString());
+//                        DBManager.getInstance().saveOrUpdateFriend(friend);
+//                        UIUtils.postTaskDelay(() -> {
+//                            BroadcastManager.getInstance(UIUtils.getContext()).sendBroadcast(AppConst.UPDATE_FRIEND);
+//                            BroadcastManager.getInstance(UIUtils.getContext()).sendBroadcast(AppConst.UPDATE_CONVERSATIONS);
+//                        }, 1000);
+//                    }
+//                }, this::loadError);
     }
 
     private void loadError(Throwable throwable) {

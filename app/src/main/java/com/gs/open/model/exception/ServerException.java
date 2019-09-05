@@ -1,7 +1,7 @@
 package com.gs.open.model.exception;
 
 import com.gs.open.R;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.UIUtils;
 
 /**
  * @创建者 CSDN_LQR

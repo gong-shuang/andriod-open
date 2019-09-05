@@ -29,7 +29,7 @@ public class JsonMananger {
      * @return
      * @throws HttpException
      */
-    public static <T> T jsonToBean(String json, Class<T> cls) throws HttpException {
+    public static <T> T jsonToBean(String json, Class<T> cls)  {
         return JSON.parseObject(json, cls);
     }
 
@@ -52,7 +52,7 @@ public class JsonMananger {
      * @return
      * @throws HttpException
      */
-    public static String beanToJson(Object obj) throws HttpException {
+    public static String beanToJson(Object obj) {
         String result = JSON.toJSONString(obj);
         Log.e(tag, "beanToJson: " + result);
         return result;

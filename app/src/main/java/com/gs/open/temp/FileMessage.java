@@ -5,7 +5,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 
-import com.gs.open.util.LogUtils;
+import com.gs.base.util.LogUtils;
+import com.gs.factory.utils.FileUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -158,6 +159,17 @@ public class FileMessage extends MediaMessageContent {
         this.setLocalPath(localUrl);
         this.mName = file.getName();
         this.mSize = file.length();
+    }
+
+    public static FileMessage obtainByOSS(String netPath) {
+
+        String fileName = FileUtil.getLocalFileByOSS(netPath);
+        if(fileName==null)
+            return null;
+
+        File file = new File(fileName);
+        return file.exists() && file.isFile() ? new FileMessage(file, Uri.parse(fileName)) : null;
+
     }
 
     public static FileMessage obtain(Uri localUrl) {

@@ -7,8 +7,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.gs.open.temp.Conversation;
-import com.gs.open.util.LogUtils;
+//import com.gs.open.temp.Conversation;
+import com.gs.base.util.LogUtils;
 import com.kyleduo.switchbutton.SwitchButton;
 import com.lqr.optionitemview.OptionItemView;
 import com.lqr.recyclerview.LQRRecyclerView;
@@ -38,7 +38,6 @@ public class SessionInfoActivity extends BaseActivity<ISessionInfoAtView, Sessio
     public static int REQ_SET_GROUP_NAME = 1002;
 
     private String mSessionId = "";
-    private Conversation.ConversationType mConversationType = Conversation.ConversationType.PRIVATE;
     private int mSessionType;
 
     @BindView(R.id.llGroupPart1)
@@ -68,14 +67,6 @@ public class SessionInfoActivity extends BaseActivity<ISessionInfoAtView, Sessio
         Intent intent = getIntent();
         mSessionId = intent.getStringExtra("sessionId");
         mSessionType = intent.getIntExtra("sessionType", SESSION_TYPE_PRIVATE);
-        switch (mSessionType) {
-            case SESSION_TYPE_PRIVATE:
-                mConversationType = Conversation.ConversationType.PRIVATE;
-                break;
-            case SESSION_TYPE_GROUP:
-                mConversationType = Conversation.ConversationType.GROUP;
-                break;
-        }
 //        registerBR();
     }
 
@@ -172,7 +163,7 @@ public class SessionInfoActivity extends BaseActivity<ISessionInfoAtView, Sessio
 
     @Override
     protected SessionInfoAtPresenter createPresenter() {
-        return new SessionInfoAtPresenter(this, mSessionId, mConversationType);
+        return new SessionInfoAtPresenter(this, mSessionId, mSessionType);
     }
 
     @Override

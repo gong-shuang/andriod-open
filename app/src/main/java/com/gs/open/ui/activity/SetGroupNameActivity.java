@@ -12,12 +12,12 @@ import com.gs.open.R;
 import com.gs.open.api.ApiRetrofit;
 import com.gs.open.app.AppConst;
 import com.gs.open.db.DBManager;
-import com.gs.open.db.model.Groups;
+//import com.gs.open.db.model.Groups;
 import com.gs.open.manager.BroadcastManager;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.LogUtils;
+import com.gs.base.util.UIUtils;
 
 import butterknife.BindView;
 import rx.Observable;
@@ -93,11 +93,11 @@ public class SetGroupNameActivity extends BaseActivity {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(setGroupNameResponse -> {
                             if (setGroupNameResponse != null && setGroupNameResponse.getCode() == 200) {
-                                Groups groups = DBManager.getInstance().getGroupsById(mGroupId);
-                                if (groups != null) {
-                                    groups.setName(groupName);
-                                    groups.saveOrUpdate("groupid=?", groups.getGroupId());
-                                }
+//                                Groups groups = DBManager.getInstance().getGroupsById(mGroupId);
+//                                if (groups != null) {
+//                                    groups.setName(groupName);
+//                                    groups.saveOrUpdate("groupid=?", groups.getGroupId());
+//                                }
                                 BroadcastManager.getInstance(SetGroupNameActivity.this).sendBroadcast(AppConst.UPDATE_CONVERSATIONS);
                                 BroadcastManager.getInstance(SetGroupNameActivity.this).sendBroadcast(AppConst.UPDATE_CURRENT_SESSION_NAME);
                                 UIUtils.showToast(UIUtils.getString(R.string.set_success));

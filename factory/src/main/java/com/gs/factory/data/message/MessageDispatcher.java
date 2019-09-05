@@ -7,6 +7,7 @@ import com.gs.factory.data.helper.GroupHelper;
 import com.gs.factory.data.helper.MessageHelper;
 import com.gs.factory.data.helper.UserHelper;
 import com.gs.factory.data.user.UserDispatcher;
+import com.gs.factory.manager.MyMessageHandler;
 import com.gs.factory.model.card.MessageCard;
 import com.gs.factory.model.db.Group;
 import com.gs.factory.model.db.Message;
@@ -118,8 +119,12 @@ public class MessageDispatcher implements MessageCenter {
                 }
                 messages.add(message);
             }
-            if (messages.size() > 0)
+            if (messages.size() > 0){
                 DbHelper.save(Message.class, messages.toArray(new Message[0]));
+                for(Message message: messages)
+                    MyMessageHandler.getInstance().add(message);
+            }
+
         }
     }
 }

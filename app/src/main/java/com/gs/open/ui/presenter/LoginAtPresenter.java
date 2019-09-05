@@ -8,22 +8,12 @@ import com.gs.factory.model.api.account.LoginModel;
 import com.gs.factory.model.db.User;
 import com.gs.factory.persistence.Account;
 import com.gs.open.R;
-import com.gs.open.api.ApiRetrofit;
-import com.gs.open.app.AppConst;
-import com.gs.open.model.cache.UserCache;
-import com.gs.open.model.exception.ServerException;
 import com.gs.open.ui.activity.MainActivity;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.ILoginAtView;
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.UIUtils;
-
-import net.qiujuer.genius.kit.handler.Run;
-import net.qiujuer.genius.kit.handler.runable.Action;
-
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import com.gs.base.util.LogUtils;
+import com.gs.base.util.UIUtils;
 
 public class LoginAtPresenter extends BasePresenter<ILoginAtView> {
 

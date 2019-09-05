@@ -21,8 +21,8 @@ import com.gs.open.ui.base.BaseFragment;
 import com.gs.open.ui.fragment.FragmentFactory;
 import com.gs.open.ui.presenter.MainAtPresenter;
 import com.gs.open.ui.view.IMainAtView;
-import com.gs.open.util.PopupWindowUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.PopupWindowUtils;
+import com.gs.base.util.UIUtils;
 
 import java.util.ArrayList;
 import java.util.List;

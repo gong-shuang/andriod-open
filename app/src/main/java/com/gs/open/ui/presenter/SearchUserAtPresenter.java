@@ -1,35 +1,23 @@
 package com.gs.open.ui.presenter;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.text.TextUtils;
-import android.view.View;
 
 import com.gs.factory.common.data.DataSource;
 import com.gs.factory.data.helper.UserHelper;
 import com.gs.factory.model.card.UserCard;
 import com.gs.open.R;
-import com.gs.open.api.ApiRetrofit;
-import com.gs.open.app.AppConst;
-import com.gs.open.model.response.GetUserInfoByIdResponse;
-import com.gs.open.model.response.GetUserInfoByPhoneResponse;
-import com.gs.open.temp.UserInfo;
-import com.gs.open.ui.activity.UserInfoActivity;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.ISearchUserAtView;
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.RegularUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.LogUtils;
+import com.gs.base.util.RegularUtils;
+import com.gs.base.util.UIUtils;
 
 
 import net.qiujuer.genius.kit.handler.Run;
 import net.qiujuer.genius.kit.handler.runable.Action;
 
 import java.util.List;
-
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class SearchUserAtPresenter extends BasePresenter<ISearchUserAtView> {
 

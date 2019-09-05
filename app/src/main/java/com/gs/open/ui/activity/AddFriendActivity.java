@@ -5,11 +5,10 @@ import android.widget.TextView;
 
 import com.gs.factory.persistence.Account;
 import com.gs.open.R;
-import com.gs.open.model.cache.UserCache;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.presenter.AddFriendAtPresenter;
 import com.gs.open.ui.view.IAddFriendAtView;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.UIUtils;
 
 import butterknife.BindView;
 

@@ -17,7 +17,7 @@ import android.widget.TextView;
 import com.jaeger.library.StatusBarUtil;
 import com.gs.open.R;
 import com.gs.open.app.MyApp;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.UIUtils;
 import com.gs.open.widget.CustomDialog;
 import com.zhy.autolayout.AutoLinearLayout;
 

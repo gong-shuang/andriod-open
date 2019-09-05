@@ -11,8 +11,7 @@ import com.gs.factory.model.card.UserCard;
 import com.gs.factory.model.db.User;
 import com.gs.factory.net.UploadHelper;
 import com.gs.factory.persistence.Account;
-import com.gs.factory.presenter.user.UpdateInfoContract;
-import com.gs.open.temp.UserInfo;
+//import com.gs.open.temp.UserInfo;
 import com.lqr.imagepicker.bean.ImageItem;
 import com.gs.open.R;
 import com.gs.open.api.ApiRetrofit;
@@ -20,13 +19,12 @@ import com.gs.open.app.AppConst;
 import com.gs.open.db.DBManager;
 import com.gs.open.db.model.Friend;
 import com.gs.open.manager.BroadcastManager;
-import com.gs.open.model.cache.UserCache;
 import com.gs.open.model.response.QiNiuTokenResponse;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.IMyInfoAtView;
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.LogUtils;
+import com.gs.base.util.UIUtils;
 
 import net.qiujuer.genius.kit.handler.Run;
 import net.qiujuer.genius.kit.handler.runable.Action;
@@ -39,7 +37,7 @@ import rx.schedulers.Schedulers;
 
 public class MyInfoAtPresenter extends BasePresenter<IMyInfoAtView> {
 
-    public UserInfo mUserInfo;
+    public User mUserInfo;
 //    private UploadManager mUploadManager;
 
     public MyInfoAtPresenter(BaseActivity context) {
@@ -48,9 +46,9 @@ public class MyInfoAtPresenter extends BasePresenter<IMyInfoAtView> {
 
     public void loadUserInfo() {
 //        mUserInfo = DBManager.getInstance().getUserInfo(UserCache.getId());
-        mUserInfo = DBManager.getInstance().getUserInfo(Account.getUser().getId());
+        mUserInfo = Account.getUser();
         if (mUserInfo != null) {
-            Glide.with(mContext).load(mUserInfo.getPortraitUri()).centerCrop().into(getView().getIvHeader());
+            Glide.with(mContext).load(mUserInfo.getPortrait()).centerCrop().into(getView().getIvHeader());
             getView().getOivName().setRightText(mUserInfo.getName());
             getView().getOivAccount().setRightText(Account.getUser().getPhone());
             getView().getOivSignature().setRightText(Account.getUser().getDesc());

@@ -1,8 +1,6 @@
 package com.gs.factory.common.app;
 
-import android.app.Activity;
 import android.content.Context;
-import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.StringRes;
 import android.util.Log;
@@ -11,12 +9,11 @@ import android.widget.Toast;
 import net.qiujuer.genius.kit.handler.Run;
 import net.qiujuer.genius.kit.handler.runable.Action;
 
-import com.gs.factory.base.BaseApp;
+
+import com.gs.base.init.BaseApp;
 import com.gs.factory.utils.FileUtil;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author qiujuer Email:qiujuer@live.cn

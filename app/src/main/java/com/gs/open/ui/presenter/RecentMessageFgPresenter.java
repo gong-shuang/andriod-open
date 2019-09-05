@@ -2,6 +2,7 @@ package com.gs.open.ui.presenter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.view.View;
@@ -10,15 +11,24 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.gs.factory.common.data.DataSource;
+import com.gs.factory.data.helper.GroupHelper;
 import com.gs.factory.data.helper.MessageHelper;
+import com.gs.factory.data.helper.UserHelper;
 import com.gs.factory.data.message.SessionRepository;
+import com.gs.factory.manager.MyMessageHandler;
+import com.gs.factory.model.db.GroupMember;
 import com.gs.factory.model.db.Message;
 import com.gs.factory.model.db.Session;
+import com.gs.factory.model.db.User;
 import com.gs.factory.persistence.Account;
 import com.gs.open.db.model.Friend;
-import com.gs.open.temp.Conversation;
-import com.gs.open.temp.TextMessage;
-import com.gs.open.temp.UserInfo;
+//import com.gs.open.temp.Conversation;
+//import com.gs.open.temp.FileMessage;
+//import com.gs.open.temp.ImageMessage;
+//import com.gs.open.temp.LocationMessage;
+//import com.gs.open.temp.TextMessage;
+//import com.gs.open.temp.UserInfo;
+//import com.gs.open.temp.VoiceMessage;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;
 import com.lqr.emoji.MoonUtils;
@@ -26,39 +36,35 @@ import com.lqr.ninegridimageview.LQRNineGridImageView;
 import com.lqr.ninegridimageview.LQRNineGridImageViewAdapter;
 import com.gs.open.R;
 import com.gs.open.db.DBManager;
-import com.gs.open.db.model.GroupMember;
-import com.gs.open.db.model.Groups;
-import com.gs.open.manager.JsonMananger;
-import com.gs.open.model.cache.UserCache;
-import com.gs.open.model.data.GroupNotificationMessageData;
+//import com.gs.open.db.model.GroupMember;
+//import com.gs.open.db.model.Groups;
 import com.gs.open.ui.activity.MainActivity;
 import com.gs.open.ui.activity.SessionActivity;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.IRecentMessageFgView;
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.MediaFileUtils;
-import com.gs.open.util.TimeUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.LogUtils;
+import com.gs.base.util.MediaFileUtils;
+import com.gs.base.util.TimeUtils;
+import com.gs.base.util.UIUtils;
 import com.gs.open.widget.CustomDialog;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.adapter.rxjava.HttpException;
 
 /**
  *
  */
 public class RecentMessageFgPresenter extends BasePresenter<IRecentMessageFgView> {
 
-    private List<Conversation> mData = new ArrayList<>();   //这个是会话的数据。
-    private LQRAdapterForRecyclerView<Conversation> mAdapter;
+//    private List<Conversation> mData = new ArrayList<>();   //这个是会话的数据。
+    private List<Session> mData = new ArrayList<>();
+    private LQRAdapterForRecyclerView<Session> mAdapter;
     private int mUnreadCountTotal = 0;
     private LQRNineGridImageViewAdapter mNgivAdapter = new LQRNineGridImageViewAdapter<GroupMember>() {
         @Override
         protected void onDisplayImage(Context context, ImageView imageView, GroupMember groupMember) {
-            Glide.with(context).load(groupMember.getPortraitUri()).centerCrop().into(imageView);
+            Glide.with(context).load(groupMember.getUser().getPortrait()).centerCrop().into(imageView);
         }
     };
     private CustomDialog mConversationMenuDialog;
@@ -67,6 +73,35 @@ public class RecentMessageFgPresenter extends BasePresenter<IRecentMessageFgView
     public RecentMessageFgPresenter(BaseActivity context) {
         super(context);
         sessionRepository = new SessionRepository();
+        MyMessageHandler.getInstance().setSessionCallback(new DataSource.SucceedCallback<Session>() {
+            @Override
+            public void onDataLoaded(Session session) {
+                int index = -1;
+                for (int i = 0; i < mData.size(); i++) {
+                    if (session.getId().equals(mData.get(i).getId())) {
+                        index = i;
+                        break;
+                    }
+                }
+
+                if (index == -1) {
+                    //新增
+                    mData.add(0, session);
+                } else {
+                    //更新
+                    mData.remove(index);
+                    mData.add(0, session);
+                }
+
+                UIUtils.postTaskSafely(new Runnable() {
+                    @Override
+                    public void run() {
+                        filterData(mData);
+                    }
+                });
+            }
+
+        });
     }
 
 
@@ -76,55 +111,71 @@ public class RecentMessageFgPresenter extends BasePresenter<IRecentMessageFgView
         setAdapter();  // 更新view。
     }
 
-    Conversation toConversation(Session session){
-        Conversation conversation = new Conversation();
-        conversation.setTargetId(session.getId());
-        conversation.setConversationTitle(session.getTitle());
-        conversation.setPortraitUrl(session.getPicture());
-        conversation.setUnreadMessageCount(session.getUnReadCount());
-        //消息
-        Message message = MessageHelper.findFromLocal(session.getMessage().getId());
-        if(message.getSender().getId().equals(Account.getUserId())){
-            //发送
-            conversation.setSentStatus(message.getStatus() == Message.STATUS_DONE ?
-                    com.gs.open.temp.Message.SentStatus.SENT :
-                    com.gs.open.temp.Message.SentStatus.SENDING);
-            conversation.setSentTime(session.getModifyAt().getTime());
-            conversation.setSenderUserId(Account.getUserId());
-            conversation.setSenderUserName(Account.getUser().getName());
-        }else{
-            //接受
-            conversation.setReceivedStatus(message.getStatus() == Message.STATUS_DONE ?
-                     new com.gs.open.temp.Message.ReceivedStatus(1) :
-                    new com.gs.open.temp.Message.ReceivedStatus(2) );
-            conversation.setReceivedTime(session.getModifyAt().getTime());
-        }
-        int type = message.getType();
-        if(type == Message.TYPE_STR){
-            conversation.setLatestMessage(new TextMessage(message.getContent()));
-        }
-
-        if(session.getReceiverType() == Message.RECEIVER_TYPE_NONE) {
-            //个人
-            conversation.setConversationType(Conversation.ConversationType.PRIVATE);
-            Friend friend =  DBManager.getInstance().getFriendById(session.getId());
-            if(friend == null)
-                return null;
-            conversation.setSenderUserId(friend.getUserId());
-            conversation.setSenderUserName(friend.getName());
-
-        }else{
-            //组
-            conversation.setConversationType(Conversation.ConversationType.GROUP);
-            Groups groups =  DBManager.getInstance().getGroupsById(session.getId());
-            if(groups == null)
-                return null;
-            conversation.setSenderUserId(groups.getGroupId());
-            conversation.setSenderUserName(groups.getName());
-        }
-
-        return conversation;
-    }
+//    Conversation toConversation(Session session){
+//        Conversation conversation = new Conversation();
+//        conversation.setTargetId(session.getId());
+//        conversation.setConversationTitle(session.getTitle());
+//        conversation.setPortraitUrl(session.getPicture());
+//        conversation.setUnreadMessageCount(session.getUnReadCount());
+//        //消息
+//        Message message = MessageHelper.findFromLocal(session.getMessage().getId());
+//        if(message.getSender().getId().equals(Account.getUserId())){
+//            //发送
+//            conversation.setSentStatus(message.getStatus() == Message.STATUS_DONE ?
+//                    com.gs.open.temp.Message.SentStatus.SENT :
+//                    com.gs.open.temp.Message.SentStatus.SENDING);
+//            conversation.setSentTime(session.getModifyAt().getTime());
+//            conversation.setSenderUserId(Account.getUserId());
+//            conversation.setSenderUserName(Account.getUser().getName());
+//        }else{
+//            //接受
+//            conversation.setReceivedStatus(message.getStatus() == Message.STATUS_DONE ?
+//                     new com.gs.open.temp.Message.ReceivedStatus(1) :
+//                    new com.gs.open.temp.Message.ReceivedStatus(2) );
+//            conversation.setReceivedTime(session.getModifyAt().getTime());
+//        }
+//        int type = message.getType();
+//        if(type == Message.TYPE_STR){
+//            conversation.setLatestMessage(TextMessage.obtain(message.getContent()));
+//        }else if(type == Message.TYPE_PIC){
+//            conversation.setLatestMessage(ImageMessage.obtain(Uri.parse(message.getContent()), Uri.parse(message.getContent())));
+//        }else if(type == Message.TYPE_FILE){
+//            FileMessage fileMessage = FileMessage.obtainByOSS(message.getContent());
+//            if(fileMessage == null)
+//                return null;
+//            conversation.setLatestMessage(fileMessage);
+//        }else if(type == Message.TYPE_AUDIO){
+//            int  value = Integer.parseInt(message.getAttach());
+//            if(value == 0)
+//                return null;
+//            conversation.setLatestMessage(VoiceMessage.obtain(Uri.parse(message.getContent()),value /1000));
+//        }else if(type == Message.TYPE_LOCATION){
+////            conversation.setLatestMessage(new LocationMessage(message.getContent()));
+//        }else{
+//            return null;
+//        }
+//
+//        if(session.getReceiverType() == Message.RECEIVER_TYPE_NONE) {
+//            //个人
+//            conversation.setConversationType(Conversation.ConversationType.PRIVATE);
+//            Friend friend =  DBManager.getInstance().getFriendById(session.getId());
+//            if(friend == null)
+//                return null;
+//            conversation.setSenderUserId(friend.getUserId());
+//            conversation.setSenderUserName(friend.getName());
+//
+//        }else{
+//            //组
+//            conversation.setConversationType(Conversation.ConversationType.GROUP);
+//            Groups groups =  DBManager.getInstance().getGroupsById(session.getId());
+//            if(groups == null)
+//                return null;
+//            conversation.setSenderUserId(groups.getGroupId());
+//            conversation.setSenderUserName(groups.getName());
+//        }
+//
+//        return conversation;
+//    }
 
     /**
      * 从本地数据库中获取。
@@ -145,21 +196,21 @@ public class RecentMessageFgPresenter extends BasePresenter<IRecentMessageFgView
 //                LogUtils.e("加载最近会话失败：" + errorCode);
 //            }
 //        });
-        sessionRepository.load(new DataSource.SucceedCallback<List<Session>>() {
+        sessionRepository.getDataByDB(new DataSource.SucceedCallback<List<Session>>() {
             @Override
             public void onDataLoaded(List<Session> sessions) {
-                if(sessions != null && sessions.size() != 0){
-                    List<Conversation> conversations = new ArrayList<>();
-                    for(Session session : sessions){
-                        Conversation conversation = toConversation(session);
-                        if(conversation != null) {
-                            conversations.add(conversation);
-                        }
-                    }
-                    if(conversations.size() == 0)
-                        return;
+                if (sessions != null && sessions.size() != 0) {
+//                    List<Conversation> conversations = new ArrayList<>();
+//                    for (Session session : sessions) {
+//                        Conversation conversation = toConversation(session);
+//                        if (conversation != null) {
+//                            conversations.add(conversation);
+//                        }
+//                    }
+//                    if (conversations.size() == 0)
+//                        return;
                     mData.clear();
-                    mData.addAll(conversations);
+                    mData.addAll(sessions);
                     UIUtils.postTaskSafely(new Runnable() {
                         @Override
                         public void run() {
@@ -171,32 +222,35 @@ public class RecentMessageFgPresenter extends BasePresenter<IRecentMessageFgView
         });
     }
 
-    private void filterData(List<Conversation> conversations) {
+    private void filterData(List<Session> conversations) {
         for (int i = 0; i < conversations.size(); i++) {
-            Conversation item = conversations.get(i);
+            Session item = conversations.get(i);
             //其他消息会话不显示（比如：系统消息）
-            if (!(item.getConversationType() == Conversation.ConversationType.PRIVATE || item.getConversationType() == Conversation.ConversationType.GROUP)) {
-                conversations.remove(i);
-                i--;
-                continue;
-            }
-            if (item.getConversationType() == Conversation.ConversationType.GROUP) {
-                List<GroupMember> groupMembers = DBManager.getInstance().getGroupMembers(item.getTargetId());
-                if (groupMembers == null || groupMembers.size() == 0) {
-                    DBManager.getInstance().deleteGroupsById(item.getTargetId());//删除没有群成员的群
+//            if (!(item.getConversationType() == Conversation.ConversationType.PRIVATE || item.getConversationType() == Conversation.ConversationType.GROUP)) {
+//                conversations.remove(i);
+//                i--;
+//                continue;
+//            }
+            if (item.getReceiverType() == Message.RECEIVER_TYPE_GROUP) {
+ //               List<GroupMember> groupMembers = DBManager.getInstance().getGroupMembers(item.getTargetId());
+                long count = GroupHelper.getMemberCount(item.getId());
+//                List<GroupMember> groupMembers = DBManager.getInstance().getGroupMembers(item.getTargetId());
+//                if (groupMembers == null || groupMembers.size() == 0) {
+//                    DBManager.getInstance().deleteGroupsById(item.getTargetId());//删除没有群成员的群
+                if(count == 0 ){
                     conversations.remove(i);
                     i--;
                 }
-            } else if (item.getConversationType() == Conversation.ConversationType.PRIVATE) {
-                if (!DBManager.getInstance().isMyFriend(item.getTargetId())) {
+            } else if (item.getReceiverType() == Message.RECEIVER_TYPE_NONE) {
+                if (UserHelper.findFromLocal(item.getId()).getRole() != User.ROLE_FRIEND) {
                     conversations.remove(i);
                     i--;
                 }
             }
         }
         mUnreadCountTotal = 0;
-        for (Conversation conversation : conversations) {
-            mUnreadCountTotal += conversation.getUnreadMessageCount();
+        for (Session conversation : conversations) {
+            mUnreadCountTotal += conversation.getUnReadCount();
         }
         updateTotalUnreadView();
         if (mAdapter != null)
@@ -218,36 +272,35 @@ public class RecentMessageFgPresenter extends BasePresenter<IRecentMessageFgView
     // 这个写的不好很好。
     private void setAdapter() {
         if (mAdapter == null) {
-            mAdapter = new LQRAdapterForRecyclerView<Conversation>(mContext, mData, R.layout.item_recent_message) {
+            mAdapter = new LQRAdapterForRecyclerView<Session>(mContext, mData, R.layout.item_recent_message) {
                 @Override
-                public void convert(LQRViewHolderForRecyclerView helper, Conversation item, int position) {
-                    if (item.getConversationType() == Conversation.ConversationType.PRIVATE) {
+                public void convert(LQRViewHolderForRecyclerView helper, Session item, int position) {
+                    if (item.getReceiverType() == Message.RECEIVER_TYPE_NONE) {
                         ImageView ivHeader = helper.getView(R.id.ivHeader);
-                        UserInfo userInfo = DBManager.getInstance().getUserInfo(item.getTargetId());
-                        if (userInfo != null) {
-                            Glide.with(mContext).load(userInfo.getPortraitUri()).centerCrop().into(ivHeader);
-                            helper.setText(R.id.tvDisplayName, userInfo.getName())
-                                    .setText(R.id.tvTime, TimeUtils.getMsgFormatTime(item.getReceivedTime()))
-                                    .setViewVisibility(R.id.ngiv, View.GONE)
-                                    .setViewVisibility(R.id.ivHeader, View.VISIBLE);
-                        }
+
+                        Glide.with(mContext).load(item.getPicture()).centerCrop().into(ivHeader);
+                        helper.setText(R.id.tvDisplayName, item.getTitle())
+                                .setText(R.id.tvTime, TimeUtils.getMsgFormatTime(item.getModifyAt().getTime()))
+                                .setViewVisibility(R.id.ngiv, View.GONE)
+                                .setViewVisibility(R.id.ivHeader, View.VISIBLE);
+
                     } else {
-                        Groups groups = DBManager.getInstance().getGroupsById(item.getTargetId());
                         //九宫格头像
                         LQRNineGridImageView ngiv = helper.getView(R.id.ngiv);
                         ngiv.setAdapter(mNgivAdapter);
-                        ngiv.setImagesData(DBManager.getInstance().getGroupMembers(item.getTargetId()));
+                        List<com.gs.factory.model.db.GroupMember> groupMembers = GroupHelper.getMemberFromGroup(item.getId());
+                        ngiv.setImagesData(groupMembers);
                         //群昵称
-                        helper.setText(R.id.tvDisplayName, groups == null ? "" : groups.getName())
-                                .setText(R.id.tvTime, TimeUtils.getMsgFormatTime(item.getReceivedTime()))
+                        helper.setText(R.id.tvDisplayName, item.getTitle())
+                                .setText(R.id.tvTime, TimeUtils.getMsgFormatTime(item.getModifyAt().getTime()))
                                 .setViewVisibility(R.id.ngiv, View.VISIBLE)
                                 .setViewVisibility(R.id.ivHeader, View.GONE);
                     }
 
 //                    helper.setBackgroundColor(R.id.flRoot, item.isTop() ? UIUtils.getColor(R.color.gray7) : UIUtils.getColor(android.R.color.white))
                     helper.setBackgroundColor(R.id.flRoot, item.isTop() ? R.color.gray8 : android.R.color.white)
-                            .setText(R.id.tvCount, item.getUnreadMessageCount() + "")
-                            .setViewVisibility(R.id.tvCount, item.getUnreadMessageCount() > 0 ? View.VISIBLE : View.GONE);
+                            .setText(R.id.tvCount, item.getUnReadCount() + "")
+                            .setViewVisibility(R.id.tvCount, item.getUnReadCount() > 0 ? View.VISIBLE : View.GONE);
                     TextView tvContent = helper.getView(R.id.tvContent);
                     if (!TextUtils.isEmpty(item.getDraft())) {
                         MoonUtils.identifyFaceExpression(mContext, tvContent, item.getDraft(), ImageSpan.ALIGN_BOTTOM);
@@ -257,23 +310,25 @@ public class RecentMessageFgPresenter extends BasePresenter<IRecentMessageFgView
                         helper.setViewVisibility(R.id.tvDraft, View.GONE);
                     }
 
-                    if (item.getLatestMessage() instanceof TextMessage) {
-                        MoonUtils.identifyFaceExpression(mContext, tvContent, ((TextMessage) item.getLatestMessage()).getContent(), ImageSpan.ALIGN_BOTTOM);
+                    if (item.getMessage().getType() == Message.TYPE_STR) {
+                        MoonUtils.identifyFaceExpression(mContext, tvContent, item.getContent(), ImageSpan.ALIGN_BOTTOM);
                     }
-//                    else if (item.getLatestMessage() instanceof ImageMessage) {
-//                        tvContent.setText("[" + UIUtils.getString(R.string.picture) + "]");
-//                    } else if (item.getLatestMessage() instanceof VoiceMessage) {
-//                        tvContent.setText("[" + UIUtils.getString(R.string.voice) + "]");
-//                    } else if (item.getLatestMessage() instanceof FileMessage) {
-//                        FileMessage fileMessage = (FileMessage) item.getLatestMessage();
-//                        if (MediaFileUtils.isImageFileType(fileMessage.getName())) {
-//                            tvContent.setText("[" + UIUtils.getString(R.string.sticker) + "]");
-//                        } else if (MediaFileUtils.isVideoFileType(fileMessage.getName())) {
-//                            tvContent.setText("[" + UIUtils.getString(R.string.video) + "]");
-//                        }
-//                    } else if (item.getLatestMessage() instanceof LocationMessage) {
-//                        tvContent.setText("[" + UIUtils.getString(R.string.location) + "]");
-//                    } else if (item.getLatestMessage() instanceof GroupNotificationMessage) {
+                    else if (item.getMessage().getType() == Message.TYPE_PIC) {
+                        tvContent.setText("[" + UIUtils.getString(R.string.picture) + "]");
+                    } else if (item.getMessage().getType() == Message.TYPE_AUDIO) {
+                        tvContent.setText("[" + UIUtils.getString(R.string.voice) + "]");
+                    } else if (item.getMessage().getType() == Message.TYPE_VIDEO) {
+                        tvContent.setText("[" + UIUtils.getString(R.string.video) + "]");
+                    } else if (item.getMessage().getType() == Message.TYPE_FILE) {
+                        if (MediaFileUtils.isImageFileType(item.getContent())) {
+                            tvContent.setText("[" + UIUtils.getString(R.string.sticker) + "]");
+                        } else if (MediaFileUtils.isVideoFileType(item.getContent())) {
+                            tvContent.setText("[" + UIUtils.getString(R.string.video) + "]");
+                        }
+                    } else if (item.getMessage().getType() == Message.TYPE_LOCATION) {
+                        tvContent.setText("[" + UIUtils.getString(R.string.location) + "]");
+                    }
+//                    else if (item.getLatestMessage() instanceof GroupNotificationMessage) {
 //                        GroupNotificationMessage groupNotificationMessage = (GroupNotificationMessage) item.getLatestMessage();
 //                        try {
 //                            UserInfo curUserInfo = DBManager.getInstance().getUserInfo(UserCache.getId());
@@ -315,9 +370,9 @@ public class RecentMessageFgPresenter extends BasePresenter<IRecentMessageFgView
             };
             mAdapter.setOnItemClickListener((helper, parent, itemView, position) -> {
                 Intent intent = new Intent(mContext, SessionActivity.class);
-                Conversation item = mData.get(position);
-                intent.putExtra("sessionId", item.getTargetId());
-                if (item.getConversationType() == Conversation.ConversationType.PRIVATE) {
+                Session item = mData.get(position);
+                intent.putExtra("sessionId", item.getId());
+                if (item.getReceiverType() == Message.RECEIVER_TYPE_NONE) {
                     intent.putExtra("sessionType", SessionActivity.SESSION_TYPE_PRIVATE);
                 } else {
                     intent.putExtra("sessionType", SessionActivity.SESSION_TYPE_GROUP);
@@ -325,7 +380,7 @@ public class RecentMessageFgPresenter extends BasePresenter<IRecentMessageFgView
                 mContext.jumpToActivity(intent);
             });
             mAdapter.setOnItemLongClickListener((helper, parent, itemView, position) -> {
-                Conversation item = mData.get(position);
+                Session item = mData.get(position);
                 View conversationMenuView = View.inflate(mContext, R.layout.dialog_conversation_menu, null);
                 mConversationMenuDialog = new CustomDialog(mContext, conversationMenuView, R.style.MyDialog);
                 TextView tvSetConversationToTop = (TextView) conversationMenuView.findViewById(R.id.tvSetConversationToTop);

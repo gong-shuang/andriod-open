@@ -7,7 +7,7 @@ import android.os.Parcelable;
 public class Message implements Parcelable {
     private Conversation.ConversationType conversationType;
     private String targetId;
-    private int messageId;
+    private String messageId;
     private Message.MessageDirection messageDirection;
     private String senderUserId;
     private Message.ReceivedStatus receivedStatus;
@@ -80,11 +80,11 @@ public class Message implements Parcelable {
         this.targetId = targetId;
     }
 
-    public int getMessageId() {
+    public String getMessageId() {
         return this.messageId;
     }
 
-    public void setMessageId(int messageId) {
+    public void setMessageId(String messageId) {
         this.messageId = messageId;
     }
 
@@ -184,7 +184,7 @@ public class Message implements Parcelable {
 //        }
 
         this.setTargetId(ParcelUtils.readFromParcel(in));
-        this.setMessageId(ParcelUtils.readIntFromParcel(in));
+        this.setMessageId(ParcelUtils.readFromParcel(in));
         this.setSenderUserId(ParcelUtils.readFromParcel(in));
         this.setReceivedTime(ParcelUtils.readLongFromParcel(in));
         this.setSentTime(ParcelUtils.readLongFromParcel(in));

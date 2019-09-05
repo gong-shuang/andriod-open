@@ -9,17 +9,20 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.gs.open.temp.UserInfo;
+//import com.gs.open.temp.UserInfo;
+import com.gs.factory.data.helper.GroupHelper;
+import com.gs.factory.model.db.GroupMember;
+import com.gs.factory.persistence.Account;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;
 import com.lqr.recyclerview.LQRRecyclerView;
 import com.gs.open.R;
 import com.gs.open.db.DBManager;
-import com.gs.open.db.model.GroupMember;
+//import com.gs.open.db.model.GroupMember;
 import com.gs.open.model.cache.UserCache;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.UIUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,11 +67,12 @@ public class RemoveGroupMemberActivity extends BaseActivity {
 
     @Override
     public void initData() {
-        List<GroupMember> groupMembers = DBManager.getInstance().getGroupMembers(mGroupId);
+//        List<GroupMember> groupMembers = DBManager.getInstance().getGroupMembers(mGroupId);
+        List<GroupMember> groupMembers = GroupHelper.getMemberFromGroup(mGroupId);
         if (groupMembers != null && groupMembers.size() > 0) {
             for (int i = 0; i < groupMembers.size(); i++) {
                 GroupMember groupMember = groupMembers.get(i);
-                if (groupMember.getUserId().equals(UserCache.getId())) {
+                if (groupMember.getUser().getId().equals(Account.getUserId())) {
                     groupMembers.remove(i);
                     break;
                 }
@@ -85,7 +89,7 @@ public class RemoveGroupMemberActivity extends BaseActivity {
             ArrayList<String> selectedIds = new ArrayList<>(mSelectedData.size());
             for (int i = 0; i < mSelectedData.size(); i++) {
                 GroupMember groupMember = mSelectedData.get(i);
-                selectedIds.add(groupMember.getUserId());
+                selectedIds.add(groupMember.getUser().getId());
             }
             Intent data = new Intent();
             data.putStringArrayListExtra("selectedIds", selectedIds);
@@ -99,9 +103,9 @@ public class RemoveGroupMemberActivity extends BaseActivity {
             mAdapter = new LQRAdapterForRecyclerView<GroupMember>(this, mData, R.layout.item_contact) {
                 @Override
                 public void convert(LQRViewHolderForRecyclerView helper, GroupMember item, int position) {
-                    helper.setText(R.id.tvName, item.getName()).setViewVisibility(R.id.cb, View.VISIBLE);
+                    helper.setText(R.id.tvName, item.getUser().getName()).setViewVisibility(R.id.cb, View.VISIBLE);
                     ImageView ivHeader = helper.getView(R.id.ivHeader);
-                    Glide.with(RemoveGroupMemberActivity.this).load(item.getPortraitUri()).centerCrop().into(ivHeader);
+                    Glide.with(RemoveGroupMemberActivity.this).load(item.getUser().getPortrait()).centerCrop().into(ivHeader);
 
                     CheckBox cb = helper.getView(R.id.cb);
                     cb.setClickable(true);
@@ -123,10 +127,10 @@ public class RemoveGroupMemberActivity extends BaseActivity {
                 }
             };
             mAdapter.setOnItemClickListener((helper, parent, itemView, position) -> {
-                UserInfo userInfo = DBManager.getInstance().getUserInfo(mData.get(position).getUserId());
-                if (userInfo != null) {
+                String id = mData.get(position).getUser().getId();
+                if (id != null) {
                     Intent intent = new Intent(RemoveGroupMemberActivity.this, UserInfoActivity.class);
-                    intent.putExtra("userInfo", userInfo);
+                    intent.putExtra("userInfo", id);
                     jumpToActivity(intent);
                 }
             });

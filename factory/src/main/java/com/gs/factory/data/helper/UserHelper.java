@@ -2,6 +2,9 @@ package com.gs.factory.data.helper;
 
 import android.text.TextUtils;
 
+import com.gs.factory.manager.MyMessageHandler;
+import com.gs.factory.model.db.Message;
+import com.gs.factory.utils.FileUtil;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import com.gs.factory.Factory;
@@ -19,6 +22,8 @@ import com.gs.factory.persistence.Account;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.transform.sax.TemplatesHandler;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -271,4 +276,31 @@ public class UserHelper {
                 .queryCustomList(UserSampleModel.class);
     }
 
+
+    //在主线程中执行
+    public static String getLocalFileAsyncUpdateDB(final User user){
+        if(user.getLocalPortrait()!=null){
+            return user.getLocalPortrait();
+        }else {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //从网络下载文件到本地
+                    String localFile = FileUtil.getLocalFileByOSS(user.getPortrait());
+                    if(localFile == null)
+                        return ;
+
+                    //查询本地的数据库
+                    User userDb = findFromLocal(user.getId());
+                    if (userDb == null)
+                        return ;
+
+                    userDb.setLocalPortrait(localFile);
+                    //保存到数据库中。
+                    DbHelper.save(User.class, userDb);
+                }
+            }).start();
+            return user.getPortrait();
+        }
+    }
 }

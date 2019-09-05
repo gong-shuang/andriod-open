@@ -129,13 +129,6 @@ dependencies {
     implementation files('libs/TencentMapSDK_Raster_v_1.2.7_51ae0e7.jar')
     implementation files('libs/TencentSearch1.1.3.jar')
 
-    //拼音
-    implementation files('libs/pinyin4j-2.5.0.jar')
-
-    //时间
-    implementation files('libs/joda-time-2.5.jar')
-    implementation files('libs/joda-time-2.5-sources.jar')
-
     //阿里oos
     api "com.aliyun.dpa:oss-android-sdk:2.9.1"
 
@@ -151,6 +144,7 @@ dependencies {
     api "com.github.Raizlabs.DBFlow:dbflow:4.0.4"
 
     api project(':library')
-    api project(':factory')
+    api project(':im')
+//    api project(':factory')
 
 }

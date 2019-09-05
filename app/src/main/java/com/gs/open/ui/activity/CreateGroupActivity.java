@@ -13,7 +13,7 @@ import com.gs.open.db.model.Friend;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.presenter.CreateGroupAtPresenter;
 import com.gs.open.ui.view.ICreateGroupAtView;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.UIUtils;
 import com.gs.open.widget.QuickIndexBar;
 
 import java.util.ArrayList;

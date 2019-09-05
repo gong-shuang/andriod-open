@@ -112,7 +112,6 @@
     <orderEntry type="library" name="Gradle: net.qiujuer.genius:res:2.1.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: net.qiujuer.genius:kit-handler:2.1.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: net.qiujuer.genius:ui:2.1.1@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:multidex:1.0.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:design:28.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:appcompat-v7:28.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:recyclerview-v7:28.0.0@aar" level="project" />
@@ -145,5 +144,7 @@
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:livedata:1.1.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:livedata-core:1.1.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.core:runtime:1.1.1@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.android.support:multidex:1.0.1@aar" level="project" />
+    <orderEntry type="module" module-name="base" />
   </component>
 </module>

@@ -4,33 +4,26 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
+import com.gs.factory.data.helper.UserHelper;
 import com.gs.factory.model.db.User;
 import com.gs.factory.persistence.Account;
-import com.gs.open.R;
-import com.gs.open.api.ApiRetrofit;
 import com.gs.open.db.DBManager;
 import com.gs.open.db.model.Friend;
 import com.gs.open.model.cache.UserCache;
-import com.gs.open.model.response.GetUserInfoByIdResponse;
-import com.gs.open.temp.UserInfo;
+////import com.gs.open.temp.UserInfo;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.IMeFgView;
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.PinyinUtils;
+import com.gs.base.util.LogUtils;
+import com.gs.base.util.PinyinUtils;
 import com.gs.open.util.RongGenerate;
-import com.gs.open.util.UIUtils;
-
-
-import java.net.URI;
-
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import com.gs.base.util.UIUtils;
 
 
 public class MeFgPresenter extends BasePresenter<IMeFgView> {
 
-    private UserInfo mUserInfo;
+//    private UserInfo mUserInfo;
+    private User user;
     private boolean isFirst = true;
 
     public MeFgPresenter(BaseActivity context) {
@@ -41,25 +34,26 @@ public class MeFgPresenter extends BasePresenter<IMeFgView> {
     public void loadUserInfo() {
 
         //从本地数据库中获取当前user的信息。
-        mUserInfo = DBManager.getInstance().getUserInfo(Account.getUserId());
-        if(mUserInfo == null ){
-            User user = Account.getUser();
-            String portrait = user.getPortrait();
-            if (TextUtils.isEmpty(portrait)) {
-                portrait = RongGenerate.generateDefaultAvatar(user.getName(), user.getId());
-                user.setPortrait(portrait);
-            }
-            mUserInfo = new UserInfo(user.getId(),user.getName(),user.getPortrait()==null ? null: Uri.parse(user.getPortrait()));
-            Friend friend = new Friend(
-                    user.getId(),
-                    user.getName(),
-                    user.getPortrait(),
-                    TextUtils.isEmpty(user.getAlias()) ? user.getName() : user.getAlias(),
-                    null, user.getPhone(), null, null,
-                    PinyinUtils.getPinyin(user.getName()),
-                    PinyinUtils.getPinyin(TextUtils.isEmpty(user.getAlias()) ? user.getName() : user.getAlias()));
-            DBManager.getInstance().saveOrUpdateFriend(friend);
-        }
+        user = Account.getUser();
+//        mUserInfo = DBManager.getInstance().getUserInfo(Account.getUserId());
+//        if(mUserInfo == null ){
+//            User user = Account.getUser();
+//            String portrait = user.getPortrait();
+//            if (TextUtils.isEmpty(portrait)) {
+//                portrait = RongGenerate.generateDefaultAvatar(user.getName(), user.getId());
+//                user.setPortrait(portrait);
+//            }
+//            mUserInfo = new UserInfo(user.getId(),user.getName(),user.getPortrait()==null ? null: Uri.parse(user.getPortrait()));
+//            Friend friend = new Friend(
+//                    user.getId(),
+//                    user.getName(),
+//                    user.getPortrait(),
+//                    TextUtils.isEmpty(user.getAlias()) ? user.getName() : user.getAlias(),
+//                    null, user.getPhone(), null, null,
+//                    PinyinUtils.getPinyin(user.getName()),
+//                    PinyinUtils.getPinyin(TextUtils.isEmpty(user.getAlias()) ? user.getName() : user.getAlias()));
+//            DBManager.getInstance().saveOrUpdateFriend(friend);
+//        }
         fillView();
 
 
@@ -87,20 +81,20 @@ public class MeFgPresenter extends BasePresenter<IMeFgView> {
 //        }
     }
 
-    public void refreshUserInfo() {
-        UserInfo userInfo = DBManager.getInstance().getUserInfo(UserCache.getId());
-        if (userInfo == null) {
-            loadUserInfo();
-        } else {
-            mUserInfo = userInfo;
-        }
-    }
+//    public void refreshUserInfo() {
+//        UserInfo userInfo = DBManager.getInstance().getUserInfo(UserCache.getId());
+//        if (userInfo == null) {
+//            loadUserInfo();
+//        } else {
+//            mUserInfo = userInfo;
+//        }
+//    }
 
     public void fillView() {
-        if (mUserInfo != null) {
-            Glide.with(mContext).load(mUserInfo.getPortraitUri()).centerCrop().into(getView().getIvHeader());
+        if (user != null) {
+            Glide.with(mContext).load(UserHelper.getLocalFileAsyncUpdateDB(user)).centerCrop().into(getView().getIvHeader());
             getView().getTvAccount().setText(Account.getUser().getPhone());
-            getView().getTvName().setText(mUserInfo.getName());
+            getView().getTvName().setText(user.getName());
         }
     }
 
@@ -109,7 +103,7 @@ public class MeFgPresenter extends BasePresenter<IMeFgView> {
         UIUtils.showToast(throwable.getLocalizedMessage());
     }
 
-    public UserInfo getUserInfo() {
-        return mUserInfo;
+    public User getUserInfo() {
+        return user;
     }
 }

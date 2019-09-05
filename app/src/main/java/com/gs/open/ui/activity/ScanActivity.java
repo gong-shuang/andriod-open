@@ -21,7 +21,7 @@ import com.gs.open.R;
 import com.gs.open.api.ApiRetrofit;
 import com.gs.open.app.AppConst;
 import com.gs.open.db.DBManager;
-import com.gs.open.db.model.Groups;
+//import com.gs.open.db.model.Groups;
 import com.gs.open.model.exception.ServerException;
 import com.gs.open.model.response.GetGroupInfoResponse;
 import com.gs.open.model.response.JoinGroupResponse;
@@ -29,9 +29,9 @@ import com.gs.open.thread.ThreadPoolFactory;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.presenter.ScanAtPresenter;
 import com.gs.open.ui.view.IScanAtView;
-import com.gs.open.util.LogUtils;
-import com.gs.open.util.PopupWindowUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.LogUtils;
+import com.gs.base.util.PopupWindowUtils;
+import com.gs.base.util.UIUtils;
 
 import java.util.ArrayList;
 
@@ -257,7 +257,7 @@ public class ScanActivity extends BaseActivity<IScanAtView, ScanAtPresenter> imp
                         .subscribe(getGroupInfoResponse -> {
                             if (getGroupInfoResponse != null && getGroupInfoResponse.getCode() == 200) {
                                 GetGroupInfoResponse.ResultEntity resultEntity = getGroupInfoResponse.getResult();
-                                DBManager.getInstance().saveOrUpdateGroup(new Groups(resultEntity.getId(), resultEntity.getName(), null, String.valueOf(0)));
+//                                DBManager.getInstance().saveOrUpdateGroup(new Groups(resultEntity.getId(), resultEntity.getName(), null, String.valueOf(0)));
                                 Intent intent = new Intent(ScanActivity.this, SessionActivity.class);
                                 intent.putExtra("sessionId", resultEntity.getId());
                                 intent.putExtra("sessionType", SessionActivity.SESSION_TYPE_GROUP);

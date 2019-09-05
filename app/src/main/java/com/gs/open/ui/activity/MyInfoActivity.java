@@ -1,26 +1,18 @@
 package com.gs.open.ui.activity;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.gs.factory.common.app.Application;
 import com.gs.factory.common.ui.media.GalleryFragment;
-import com.gs.factory.model.db.User;
-import com.gs.open.app.MyApp;
-import com.gs.open.util.UIUtils;
-import com.lqr.imagepicker.ImagePicker;
-import com.lqr.imagepicker.bean.ImageItem;
-import com.lqr.imagepicker.ui.ImageGridActivity;
+import com.gs.base.util.UIUtils;
 import com.lqr.optionitemview.OptionItemView;
 import com.gs.open.R;
 import com.gs.open.app.AppConst;
@@ -31,7 +23,6 @@ import com.gs.open.ui.view.IMyInfoAtView;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import butterknife.BindView;
 
@@ -79,7 +70,7 @@ public class MyInfoActivity extends BaseActivity<IMyInfoAtView, MyInfoAtPresente
     public void initListener() {
         mIvHeader.setOnClickListener(v -> {
             Intent intent = new Intent(MyInfoActivity.this, ShowBigImageActivity.class);
-            intent.putExtra("url", mPresenter.mUserInfo.getPortraitUri().toString());
+            intent.putExtra("url", mPresenter.mUserInfo.getPortrait().toString());
             jumpToActivity(intent);
         });
         //更换头像，以前的方法，废弃

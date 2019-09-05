@@ -3,10 +3,13 @@ package com.gs.factory.net;
 import android.text.format.DateFormat;
 import android.util.Log;
 
+import com.alibaba.sdk.android.oss.ClientException;
 import com.alibaba.sdk.android.oss.OSS;
 import com.alibaba.sdk.android.oss.OSSClient;
+import com.alibaba.sdk.android.oss.ServiceException;
 import com.alibaba.sdk.android.oss.common.auth.OSSCredentialProvider;
 import com.alibaba.sdk.android.oss.common.auth.OSSPlainTextAKSKCredentialProvider;
+import com.alibaba.sdk.android.oss.model.GetObjectRequest;
 import com.alibaba.sdk.android.oss.model.PutObjectRequest;
 import com.alibaba.sdk.android.oss.model.PutObjectResult;
 
@@ -26,10 +29,12 @@ public class UploadHelper {
     private static final String TAG = UploadHelper.class.getSimpleName();
     // 与你们的存储区域有关系
 //    public static final String ENDPOINT = "http://oss-cn-hongkong.aliyuncs.com";
-    public static final String ENDPOINT = "oss-cn-beijing.aliyuncs.com";
+    public static final String ENDPOINT = "http://oss-cn-beijing.aliyuncs.com";
     // 上传的仓库名
 //    private static final String BUCKET_NAME = "italker";
     private static final String BUCKET_NAME = "italker-gs";
+    private static final String ACCESS_KEYID = "LTAIThDt3umMZkGF";
+    private static final String ACCESS_KEYSECRET = "NeIPbJ3XZomqBAcIAUo7Aypkcde9pn";
 
 
     private static OSS getClient() {
@@ -38,7 +43,7 @@ public class UploadHelper {
 //        OSSCredentialProvider credentialProvider = new OSSPlainTextAKSKCredentialProvider(
 //                "LTAIYQD07p05pHQW", "2txxzT8JXiHKEdEjylumFy6sXcDQ0G");
         OSSCredentialProvider credentialProvider = new OSSPlainTextAKSKCredentialProvider(
-                "LTAIThDt3umMZkGF", "NeIPbJ3XZomqBAcIAUo7Aypkcde9pn");
+                ACCESS_KEYID, ACCESS_KEYSECRET);
         return new OSSClient(Factory.app(), ENDPOINT, credentialProvider);
     }
 
@@ -106,6 +111,16 @@ public class UploadHelper {
     }
 
     /**
+     * 上传视频
+     * @param path
+     * @return
+     */
+    public static String uploadVideo(String path) {
+        String key = getVideoObjKey(path);
+        return upload(key, path);
+    }
+
+    /**
      * 分月存储，避免一个文件夹太多
      *
      * @return yyyyMM
@@ -134,4 +149,12 @@ public class UploadHelper {
         String dateString = getDateString();
         return String.format("audio/%s/%s.mp3", dateString, fileMd5);
     }
+
+    // video/201703/dawewqfas243rfawr234.mp4
+    private static String getVideoObjKey(String path) {
+        String fileMd5 = HashUtil.getMD5String(new File(path));
+        String dateString = getDateString();
+        return String.format("video/%s/%s.mp4", dateString, fileMd5);
+    }
+
 }

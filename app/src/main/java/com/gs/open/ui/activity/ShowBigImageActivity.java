@@ -19,8 +19,8 @@ import com.gs.open.api.ApiRetrofit;
 import com.gs.open.app.AppConst;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
-import com.gs.open.util.PopupWindowUtils;
-import com.gs.open.util.UIUtils;
+import com.gs.base.util.PopupWindowUtils;
+import com.gs.base.util.UIUtils;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -1,5 +1,6 @@
 package com.gs.factory.data.group;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -9,6 +10,7 @@ import com.gs.factory.data.helper.GroupHelper;
 import com.gs.factory.model.db.Group;
 import com.gs.factory.model.db.Group_Table;
 import com.gs.factory.model.db.view.MemberUserModel;
+import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransaction;
 
 import java.util.List;
 
@@ -33,6 +35,25 @@ public class GroupsRepository extends BaseDbRepository<Group>
                 .async()
                 .queryListResultCallback(this)
                 .execute();
+    }
+
+    @Override
+    public void getDataByDB(final SucceedCallback<List<Group>> callback) {
+        SQLite.select()
+                .from(Group.class)
+                .orderBy(Group_Table.name, true)
+                .limit(100)
+                .async()
+                .queryListResultCallback(new QueryTransaction.QueryResultListCallback<Group>() {
+                    @Override
+                    public void onListQueryResult(QueryTransaction transaction, @NonNull List<Group> tResult) {
+                        if(callback != null){
+                            callback.onDataLoaded(tResult);
+                        }
+                    }
+                })
+                .execute();
+
     }
 
     @Override

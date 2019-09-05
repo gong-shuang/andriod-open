@@ -48,6 +48,25 @@ public class MessageGroupRepository extends BaseDbRepository<Message>
     }
 
     @Override
+    public void getDataByDB(final SucceedCallback<List<Message>> callback) {
+        SQLite.select()
+                .from(Message.class)
+                .where(Message_Table.group_id.eq(receiverId))
+                .orderBy(Message_Table.createAt, false)
+                .limit(30)
+                .async()
+                .queryListResultCallback(new QueryTransaction.QueryResultListCallback<Message>() {
+                    @Override
+                    public void onListQueryResult(QueryTransaction transaction, @NonNull List<Message> tResult) {
+                        if(callback != null){
+                            callback.onDataLoaded(tResult);
+                        }
+                    }
+                })
+                .execute();
+    }
+
+    @Override
     protected boolean isRequired(Message message) {
         // 如果消息的Group不为空，则一定是发送到一个群的
         // 如果群Id等于我们需要的，那就是通过
