@@ -47,8 +47,11 @@ public class MyInfoAtPresenter extends BasePresenter<IMyInfoAtView> {
     public void loadUserInfo() {
 //        mUserInfo = DBManager.getInstance().getUserInfo(UserCache.getId());
         mUserInfo = Account.getUser();
+        LogUtils.d("11user1: " + mUserInfo.getLocalPortrait());
+        User userDb = UserHelper.findFromLocal(Account.getUserId());
+        LogUtils.d("11user2: " + userDb.getLocalPortrait());
         if (mUserInfo != null) {
-            Glide.with(mContext).load(mUserInfo.getPortrait()).centerCrop().into(getView().getIvHeader());
+            Glide.with(mContext).load(UserHelper.getLocalFileAsyncUpdateDB(mUserInfo)).centerCrop().into(getView().getIvHeader());
             getView().getOivName().setRightText(mUserInfo.getName());
             getView().getOivAccount().setRightText(Account.getUser().getPhone());
             getView().getOivSignature().setRightText(Account.getUser().getDesc());

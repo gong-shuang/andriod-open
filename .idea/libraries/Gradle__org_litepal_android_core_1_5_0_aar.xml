@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Gradle: org.litepal.android:core:1.5.0@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/b77bd6b12e87bca0c18c9c782b6cded3/core-1.5.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/b77bd6b12e87bca0c18c9c782b6cded3/core-1.5.0/res" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.litepal.android/core/1.5.0/33e7567fdf41ec8e86c47e2936532ac8b28adad0/core-1.5.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.litepal.android/core/1.5.0/1035adf3c2a2e779b43348a17cccb3f04dcc6371/core-1.5.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

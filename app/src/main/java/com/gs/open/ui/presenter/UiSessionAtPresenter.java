@@ -683,7 +683,7 @@ public class UiSessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> 
     public void dispose() {
         if(mConversationType  == Message.RECEIVER_TYPE_NONE) {
             messageRepository.dispose();
-            MyMessageHandler.getInstance().setMessageCallback(null);
+            MyMessageHandler.getInstance().setMessageCallback(null, null);
         }else {
             messageGroupRepository.dispose();
         }
@@ -749,13 +749,12 @@ public class UiSessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> 
     }
 
     public void setListener(){
-        MyMessageHandler.getInstance().setMessageCallback(new DataSource.SucceedCallback<com.gs.factory.model.db.Message>() {
+        MyMessageHandler.getInstance().setMessageCallback(mSessionId, new DataSource.SucceedCallback<com.gs.factory.model.db.Message>() {
             @Override
             public void onDataLoaded(com.gs.factory.model.db.Message message) {
                 //每次只有一个数据
        //         Message messageUI = toMessageUI(message);
-                if(!(message != null &&
-                        (message.getReceiver().getId().equals(mSessionId) || message.getGroup().getId().equals(mSessionId))))
+                if(message == null )
                     return;
                 int index=-1;
                 for(int i=0; i < mData.size(); i++){

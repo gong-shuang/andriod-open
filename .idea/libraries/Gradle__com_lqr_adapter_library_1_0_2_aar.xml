@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Gradle: com.lqr.adapter:library:1.0.2@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8aaaac8ac9f909c020852eb7aad60960/library-1.0.2/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8aaaac8ac9f909c020852eb7aad60960/library-1.0.2/res" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.lqr.adapter/library/1.0.2/63c125eed99951be47f7185114b2eced20684ec5/library-1.0.2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.lqr.adapter/library/1.0.2/afa3d3d80ef2ee3ed383aebf0a17f6deda5fbd19/library-1.0.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

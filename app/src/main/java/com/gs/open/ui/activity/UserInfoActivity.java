@@ -107,7 +107,7 @@ public class UserInfoActivity extends BaseActivity {
     @Override
     public void initData() {
  //       mFriend = DBManager.getInstance().getFriendById(mUserInfo.getId());
-        Glide.with(this).load(DBManager.getInstance().getPortraitUri(mUserInfo)).centerCrop().into(mIvHeader);
+        Glide.with(this).load(UserHelper.getLocalFileAsyncUpdateDB(mUserInfo)).centerCrop().into(mIvHeader);
         mTvAccount.setText(UIUtils.getString(R.string.my_chat_account, Account.getUser().getPhone()));
         mTvName.setText(mUserInfo.getName());
 

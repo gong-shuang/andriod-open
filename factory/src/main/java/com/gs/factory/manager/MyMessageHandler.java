@@ -22,7 +22,7 @@ public class MyMessageHandler {
     private LinkedBlockingQueue<Message> queue = new LinkedBlockingQueue();
     private MyThread myThread;
     private DataSource.SucceedCallback<Message> messageCallback;
-    private DataSource.SucceedCallback<Session> sessionCallback;
+    private String sessionID;
 
     public MyMessageHandler() {
         myThread = new MyThread("MyMessage");
@@ -67,22 +67,18 @@ public class MyMessageHandler {
 
     public void handleMessage(Message message){
         //处理 message
-        if(messageCallback !=null)
-            messageCallback.onDataLoaded(message);
+        if(sessionID.equals(message.getSender().getId())||
+                sessionID.equals(message.getGroup().getId())){
+            if(messageCallback !=null)
+                messageCallback.onDataLoaded(message);
+        }
 
-//        Session session = Session.createSessionIdentify(message);
-
-        //处理 session
-//        if(sessionCallback != null)
-//            sessionCallback.onDataLoaded(session);
 
     }
 
-    public void setMessageCallback(DataSource.SucceedCallback<Message> messageCallback) {
+    public void setMessageCallback(String session, DataSource.SucceedCallback<Message> messageCallback) {
+        this.sessionID = session;
         this.messageCallback = messageCallback;
     }
 
-    public void setSessionCallback(DataSource.SucceedCallback<Session> sessionCallback) {
-        this.sessionCallback = sessionCallback;
-    }
 }

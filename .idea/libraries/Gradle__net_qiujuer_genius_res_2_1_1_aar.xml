@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Gradle: net.qiujuer.genius:res:2.1.1@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/a41c827ae07370e4380c65cce4e59a6b/res-2.1.1/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/a41c827ae07370e4380c65cce4e59a6b/res-2.1.1/res" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.qiujuer.genius/res/2.1.1/358deed3f5441655650a827719c1b1d9cb99b305/res-2.1.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.qiujuer.genius/res/2.1.1/df02a4aec491229af562db95484205d2aa3b23b1/res-2.1.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

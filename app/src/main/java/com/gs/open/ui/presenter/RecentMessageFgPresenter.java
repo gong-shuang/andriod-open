@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.gs.factory.common.data.DataSource;
+import com.gs.factory.data.helper.DbHelper;
 import com.gs.factory.data.helper.GroupHelper;
 import com.gs.factory.data.helper.MessageHelper;
 import com.gs.factory.data.helper.UserHelper;
@@ -73,7 +74,7 @@ public class RecentMessageFgPresenter extends BasePresenter<IRecentMessageFgView
     public RecentMessageFgPresenter(BaseActivity context) {
         super(context);
         sessionRepository = new SessionRepository();
-        MyMessageHandler.getInstance().setSessionCallback(new DataSource.SucceedCallback<Session>() {
+        DbHelper.setSessionCallback(new DataSource.SucceedCallback<Session>() {
             @Override
             public void onDataLoaded(Session session) {
                 int index = -1;

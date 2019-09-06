@@ -2,6 +2,7 @@ package com.gs.factory.data.message;
 
 import android.text.TextUtils;
 
+import com.gs.base.util.FileUtils;
 import com.gs.factory.data.helper.DbHelper;
 import com.gs.factory.data.helper.GroupHelper;
 import com.gs.factory.data.helper.MessageHelper;
@@ -96,6 +97,7 @@ public class MessageDispatcher implements MessageCenter {
                     }
 
                     // 更新一些会变化的内容
+                    updateLocalPath(message);
                     message.setContent(card.getContent());
                     message.setAttach(card.getAttach());
                     // 更新状态
@@ -125,6 +127,19 @@ public class MessageDispatcher implements MessageCenter {
                     MyMessageHandler.getInstance().add(message);
             }
 
+        }
+    }
+
+    public  void  updateLocalPath(Message message){
+        int type = message.getType();
+        if(type == Message.TYPE_AUDIO &&
+                type == Message.TYPE_VIDEO &&
+                type == Message.TYPE_FILE &&
+                type == Message.TYPE_PIC){
+            String content = message.getContent();
+            //如果是本地目录，则放在LoaclPath。
+            if(content.contains(FileUtils.ROOT_DIR))
+                message.setLocalPath(content);
         }
     }
 }

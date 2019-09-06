@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Gradle: net.qiujuer.genius:kit-reflect:2.1.1@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/af91bacf8efdaa4a3c7e953a7bd8f998/kit-reflect-2.1.1/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/af91bacf8efdaa4a3c7e953a7bd8f998/kit-reflect-2.1.1/res" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.qiujuer.genius/kit-reflect/2.1.1/11d0c17a0e337170cbaeadfcb97577751f31c281/kit-reflect-2.1.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.qiujuer.genius/kit-reflect/2.1.1/69253d6c8152876490198a1e62ae2d080e6f27bc/kit-reflect-2.1.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

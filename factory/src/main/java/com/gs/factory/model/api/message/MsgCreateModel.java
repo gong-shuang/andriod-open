@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.UUID;
 
 /**
+ * 发送给服务器的
  * @author qiujuer Email:qiujuer@live.cn
  * @version 1.0.0
  */

@@ -2,6 +2,7 @@ package com.gs.factory.data.helper;
 
 import android.text.TextUtils;
 
+import com.gs.base.util.LogUtils;
 import com.gs.factory.manager.MyMessageHandler;
 import com.gs.factory.model.db.Message;
 import com.gs.factory.utils.FileUtil;
@@ -279,7 +280,7 @@ public class UserHelper {
 
     //在主线程中执行
     public static String getLocalFileAsyncUpdateDB(final User user){
-        if(user.getLocalPortrait()!=null){
+        if(user.getLocalPortrait() != null){
             return user.getLocalPortrait();
         }else {
             new Thread(new Runnable() {
@@ -297,7 +298,11 @@ public class UserHelper {
 
                     userDb.setLocalPortrait(localFile);
                     //保存到数据库中。
-                    DbHelper.save(User.class, userDb);
+               //     DbHelper.save(User.class, userDb);
+                    boolean ret = userDb.save();
+                    LogUtils.d("ret:" + ret);
+                    User userD = findFromLocal(user.getId());
+                    LogUtils.d("userD:" + userD.getLocalPortrait());
                 }
             }).start();
             return user.getPortrait();

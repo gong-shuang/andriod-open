@@ -354,8 +354,11 @@ public class UISessionAdapter  extends LQRAdapterForRecyclerView<Message> {
 
     private void setAvatar(LQRViewHolderForRecyclerView helper, Message item, int position) {
         ImageView ivAvatar = helper.getView(R.id.ivAvatar);
+        User sender = item.getSender();
+        // 进行数据加载
+        sender.load();
 
-        Glide.with(mContext).load(item.getSender().getPortrait()).centerCrop().into(ivAvatar);
+        Glide.with(mContext).load(sender.getPortrait()).centerCrop().into(ivAvatar);
 
     }
 

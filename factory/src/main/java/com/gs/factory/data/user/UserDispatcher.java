@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.gs.factory.data.helper.DbHelper;
 import com.gs.factory.model.card.UserCard;
 import com.gs.factory.model.db.User;
+import com.gs.factory.persistence.Account;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +59,9 @@ public class UserDispatcher implements UserCenter {
                 if (card == null || TextUtils.isEmpty(card.getId()))
                     continue;
                 // 添加操作
-                users.add(card.build());
+                User  user = card.build();
+                user.setRole(user.getId().equals(Account.getUserId())? User.ROLE_SELF:User.ROLE_FRIEND);
+                users.add(user);
             }
 
             // 进行数据库存储，并分发通知, 异步的操作

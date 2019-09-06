@@ -1,5 +1,6 @@
 package com.gs.factory.data.helper;
 
+import com.gs.factory.common.data.DataSource;
 import com.raizlabs.android.dbflow.config.DatabaseDefinition;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -31,6 +32,8 @@ import java.util.Set;
  */
 public class DbHelper {
     private static final DbHelper instance;
+
+    private static DataSource.SucceedCallback<Session> mSessionCallback;
 
     static {
         instance = new DbHelper();
@@ -281,6 +284,10 @@ public class DbHelper {
                     adapter.save(session);
                     // 添加到集合
                     sessions[index++] = session;
+
+                    //处理 session
+                    if(mSessionCallback != null)
+                        mSessionCallback.onDataLoaded(session);
                 }
 
                 // 调用直接进行一次通知分发
@@ -298,5 +305,9 @@ public class DbHelper {
         void onDataSave(Data... list);
 
         void onDataDelete(Data... list);
+    }
+
+    public static void setSessionCallback(DataSource.SucceedCallback<Session> sessionCallback) {
+        mSessionCallback = sessionCallback;
     }
 }
