@@ -18,13 +18,13 @@ import com.lqr.imagepicker.ImagePicker;
 import com.lqr.imagepicker.bean.ImageItem;
 import com.lqr.imagepicker.ui.ImageGridActivity;
 import com.gs.open.R;
-import com.gs.open.api.ApiRetrofit;
+//import com.gs.open.delete.ApiRetrofit;
 import com.gs.open.app.AppConst;
-import com.gs.open.db.DBManager;
+//import com.gs.open.delete.db.DBManager;
 //import com.gs.open.db.model.Groups;
-import com.gs.open.model.exception.ServerException;
-import com.gs.open.model.response.GetGroupInfoResponse;
-import com.gs.open.model.response.JoinGroupResponse;
+//import com.gs.open.delete.model.exception.ServerException;
+//import com.gs.open.delete.model.response.GetGroupInfoResponse;
+//import com.gs.open.delete.model.response.JoinGroupResponse;
 import com.gs.open.thread.ThreadPoolFactory;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.presenter.ScanAtPresenter;
@@ -228,10 +228,10 @@ public class ScanActivity extends BaseActivity<IScanAtView, ScanAtPresenter> imp
         //添加好友
         if (result.startsWith(AppConst.QrCodeCommon.ADD)) {
             String account = result.substring(AppConst.QrCodeCommon.ADD.length());
-            if (DBManager.getInstance().isMyFriend(account)) {
-                UIUtils.showToast(UIUtils.getString(R.string.this_account_was_your_friend));
-                return;
-            }
+//            if (DBManager.getInstance().isMyFriend(account)) {
+//                UIUtils.showToast(UIUtils.getString(R.string.this_account_was_your_friend));
+//                return;
+//            }
             Intent intent = new Intent(ScanActivity.this, PostScriptActivity.class);
             intent.putExtra("userId", account);
             startActivity(intent);
@@ -240,34 +240,34 @@ public class ScanActivity extends BaseActivity<IScanAtView, ScanAtPresenter> imp
         //进群
         else if (result.startsWith(AppConst.QrCodeCommon.JOIN)) {
             String groupId = result.substring(AppConst.QrCodeCommon.JOIN.length());
-            if (DBManager.getInstance().isInThisGroup(groupId)) {
-                UIUtils.showToast(UIUtils.getString(R.string.you_already_in_this_group));
-                return;
-            } else {
-                ApiRetrofit.getInstance().JoinGroup(groupId)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .filter(joinGroupResponse -> joinGroupResponse != null && joinGroupResponse.getCode() == 200)
-                        .flatMap(new Func1<JoinGroupResponse, Observable<GetGroupInfoResponse>>() {
-                            @Override
-                            public Observable<GetGroupInfoResponse> call(JoinGroupResponse joinGroupResponse) {
-                                return ApiRetrofit.getInstance().getGroupInfo(groupId);//似乎这里会报错，导致下面subscribe中的逻辑没有执行，不知道为啥。。
-                            }
-                        })
-                        .subscribe(getGroupInfoResponse -> {
-                            if (getGroupInfoResponse != null && getGroupInfoResponse.getCode() == 200) {
-                                GetGroupInfoResponse.ResultEntity resultEntity = getGroupInfoResponse.getResult();
-//                                DBManager.getInstance().saveOrUpdateGroup(new Groups(resultEntity.getId(), resultEntity.getName(), null, String.valueOf(0)));
-                                Intent intent = new Intent(ScanActivity.this, SessionActivity.class);
-                                intent.putExtra("sessionId", resultEntity.getId());
-                                intent.putExtra("sessionType", SessionActivity.SESSION_TYPE_GROUP);
-                                jumpToActivity(intent);
-                                finish();
-                            } else {
-                                Observable.error(new ServerException(UIUtils.getString(R.string.select_group_info_fail_please_restart_app)));
-                            }
-                        }, this::loadError);
-            }
+//            if (DBManager.getInstance().isInThisGroup(groupId)) {
+//                UIUtils.showToast(UIUtils.getString(R.string.you_already_in_this_group));
+//                return;
+//            } else {
+//                ApiRetrofit.getInstance().JoinGroup(groupId)
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .filter(joinGroupResponse -> joinGroupResponse != null && joinGroupResponse.getCode() == 200)
+//                        .flatMap(new Func1<JoinGroupResponse, Observable<GetGroupInfoResponse>>() {
+//                            @Override
+//                            public Observable<GetGroupInfoResponse> call(JoinGroupResponse joinGroupResponse) {
+//                                return ApiRetrofit.getInstance().getGroupInfo(groupId);//似乎这里会报错，导致下面subscribe中的逻辑没有执行，不知道为啥。。
+//                            }
+//                        })
+//                        .subscribe(getGroupInfoResponse -> {
+//                            if (getGroupInfoResponse != null && getGroupInfoResponse.getCode() == 200) {
+//                                GetGroupInfoResponse.ResultEntity resultEntity = getGroupInfoResponse.getResult();
+////                                DBManager.getInstance().saveOrUpdateGroup(new Groups(resultEntity.getId(), resultEntity.getName(), null, String.valueOf(0)));
+//                                Intent intent = new Intent(ScanActivity.this, SessionActivity.class);
+//                                intent.putExtra("sessionId", resultEntity.getId());
+//                                intent.putExtra("sessionType", SessionActivity.SESSION_TYPE_GROUP);
+//                                jumpToActivity(intent);
+//                                finish();
+//                            } else {
+//                                Observable.error(new ServerException(UIUtils.getString(R.string.select_group_info_fail_please_restart_app)));
+//                            }
+//                        }, this::loadError);
+//            }
         }
     }
 

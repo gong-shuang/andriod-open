@@ -10,7 +10,7 @@ import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
-import com.gs.factory.persistence.Account;
+import com.gs.im.persistence.Account;
 import com.gs.base.util.LogUtils;
 import com.jaeger.library.StatusBarUtil;
 import com.gs.open.R;

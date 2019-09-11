@@ -180,7 +180,6 @@
     <orderEntry type="library" name="Gradle: com.bm.photoview:library:1.4.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: de.hdodenhof:circleimageview:2.1.0@aar" level="project" />
     <orderEntry type="module" module-name="im" />
-    <orderEntry type="module" module-name="factory" />
     <orderEntry type="module" module-name="library" />
     <orderEntry type="module" module-name="base" />
   </component>

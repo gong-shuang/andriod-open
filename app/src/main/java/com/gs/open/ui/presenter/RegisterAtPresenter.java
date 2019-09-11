@@ -2,15 +2,14 @@ package com.gs.open.ui.presenter;
 
 import android.text.TextUtils;
 
-import com.gs.factory.common.data.DataSource;
-import com.gs.factory.data.helper.AccountHelper;
-import com.gs.factory.model.api.account.RegisterModel;
-import com.gs.factory.model.db.User;
-import com.gs.factory.persistence.Account;
+import com.gs.im.common.data.DataSource;
+import com.gs.im.data.helper.AccountHelper;
+import com.gs.im.model.api.account.RegisterModel;
+import com.gs.im.model.db.User;
+import com.gs.im.persistence.Account;
 import com.gs.open.R;
-import com.gs.open.model.cache.UserCache;
+//import com.gs.open.delete.model.cache.UserCache;
 import com.gs.open.ui.activity.LoginActivity;
-import com.gs.open.ui.activity.MainActivity;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.IRegisterAtView;
@@ -191,18 +190,18 @@ public class RegisterAtPresenter extends BasePresenter<IRegisterAtView> {
             @Override
             public void onDataLoaded(User user) {
                 // 当网络请求成功，注册好了，回送一个用户信息回来
-                UserCache.save(user.getId(), phone, null);
-                // 此时是从网络回送回来的，并不保证处于主现场状态
-                // 强制执行在主线程中
-                Run.onUiAsync(new Action() {
-                    @Override
-                    public void call() {
-                        // 调用主界面注册成功
-                        mContext.jumpToActivityAndClearTask(MainActivity.class);
-                        mContext.finish();
-//                        MyApp.exit();
-                    }
-                });
+//                UserCache.save(user.getId(), phone, null);
+//                // 此时是从网络回送回来的，并不保证处于主现场状态
+//                // 强制执行在主线程中
+//                Run.onUiAsync(new Action() {
+//                    @Override
+//                    public void call() {
+//                        // 调用主界面注册成功
+//                        mContext.jumpToActivityAndClearTask(MainActivity.class);
+//                        mContext.finish();
+////                        MyApp.exit();
+//                    }
+//                });
 
 
             }

@@ -7,7 +7,7 @@ import android.view.View;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;
 import com.gs.open.R;
-import com.gs.open.model.data.LocationData;
+//import com.gs.open.delete.model.data.LocationData;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.IMyLocationAtView;
@@ -62,10 +62,10 @@ public class MyLocationAtPresenter extends BasePresenter<IMyLocationAtView> {
         if (mData != null && mData.size() > mSelectedPosi) {
             Geo2AddressResultObject.ReverseAddressResult.Poi poi = mData.get(mSelectedPosi);
             Intent data = new Intent();
-            LocationData locationData = new LocationData(poi.location.lat, poi.location.lng, poi.title, getMapUrl(poi.location.lat, poi.location.lng));
-            data.putExtra("location", locationData);
-            mContext.setResult(Activity.RESULT_OK, data);
-            mContext.finish();
+//            LocationData locationData = new LocationData(poi.location.lat, poi.location.lng, poi.title, getMapUrl(poi.location.lat, poi.location.lng));
+//            data.putExtra("location", locationData);
+//            mContext.setResult(Activity.RESULT_OK, data);
+//            mContext.finish();
         }
     }
 

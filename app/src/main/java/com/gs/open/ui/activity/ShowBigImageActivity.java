@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.bm.library.PhotoView;
 import com.bumptech.glide.Glide;
 import com.gs.open.R;
-import com.gs.open.api.ApiRetrofit;
+//import com.gs.open.delete.ApiRetrofit;
 import com.gs.open.app.AppConst;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
@@ -104,15 +104,15 @@ public class ShowBigImageActivity extends BaseActivity {
                             mPopupWindow.dismiss();
                             mPopupWindow = null;
                         } else {
-                            ApiRetrofit.getInstance()
-                                    .mApi
-                                    .downloadPic(mUrl)
-                                    .subscribeOn(Schedulers.newThread())
-                                    .subscribe(responseBody -> {
-                                        UIUtils.showToast(saveToDisk(responseBody) ? UIUtils.getString(R.string.save_success) : UIUtils.getString(R.string.save_fail));
-                                        mPopupWindow.dismiss();
-                                        mPopupWindow = null;
-                                    });
+//                            ApiRetrofit.getInstance()
+//                                    .mApi
+//                                    .downloadPic(mUrl)
+//                                    .subscribeOn(Schedulers.newThread())
+//                                    .subscribe(responseBody -> {
+//                                        UIUtils.showToast(saveToDisk(responseBody) ? UIUtils.getString(R.string.save_success) : UIUtils.getString(R.string.save_fail));
+//                                        mPopupWindow.dismiss();
+//                                        mPopupWindow = null;
+//                                    });
                         }
 
                     }

@@ -1,38 +1,32 @@
 package com.gs.open.ui.presenter;
 
 import android.content.Intent;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.gs.factory.common.data.DataSource;
-import com.gs.factory.data.helper.GroupHelper;
-import com.gs.factory.data.helper.UserHelper;
-import com.gs.factory.model.api.group.GroupMemberAddModel;
-import com.gs.factory.model.api.group.GroupMemberDelModel;
-import com.gs.factory.model.card.GroupMemberCard;
-import com.gs.factory.model.card.GroupResponseCard;
-import com.gs.factory.model.db.Group;
-import com.gs.factory.model.db.GroupMember;
-import com.gs.factory.model.db.User;
-import com.gs.factory.persistence.Account;
-import com.gs.open.db.model.Friend;
+import com.gs.im.common.data.DataSource;
+import com.gs.im.data.helper.GroupHelper;
+import com.gs.im.data.helper.UserHelper;
+import com.gs.im.model.api.group.GroupMemberAddModel;
+import com.gs.im.model.api.group.GroupMemberDelModel;
+import com.gs.im.model.card.GroupMemberCard;
+import com.gs.im.model.card.GroupResponseCard;
+import com.gs.im.model.db.GroupMember;
+import com.gs.im.model.db.User;
+import com.gs.im.persistence.Account;
 //import com.gs.open.temp.Conversation;
 //import com.gs.open.temp.UserInfo;
 import com.gs.open.ui.UIGroupMember;
 import com.gs.open.ui.activity.MainActivity;
-import com.gs.open.ui.activity.SessionActivity;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;
 import com.gs.open.R;
-import com.gs.open.api.ApiRetrofit;
-import com.gs.open.db.DBManager;
+//import com.gs.open.delete.ApiRetrofit;
 //import com.gs.open.db.model.GroupMember;
 //import com.gs.open.db.model.Groups;
-import com.gs.open.model.cache.UserCache;
-import com.gs.open.model.response.QuitGroupResponse;
+//import com.gs.open.delete.model.response.QuitGroupResponse;
 import com.gs.open.ui.activity.CreateGroupActivity;
 import com.gs.open.ui.activity.RemoveGroupMemberActivity;
 import com.gs.open.ui.activity.SessionInfoActivity;
@@ -41,7 +35,6 @@ import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.ISessionInfoAtView;
 import com.gs.base.util.LogUtils;
-import com.gs.base.util.PinyinUtils;
 import com.gs.base.util.UIUtils;
 import com.gs.open.widget.CustomDialog;
 
@@ -53,10 +46,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 import static com.gs.open.ui.activity.SessionActivity.SESSION_TYPE_GROUP;
 import static com.gs.open.ui.activity.SessionActivity.SESSION_TYPE_PRIVATE;
@@ -74,7 +63,7 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
     public String mDisplayName = "";
     private CustomDialog mSetDisplayNameDialog;
 //    private Groups mGroups;
-    private Observable<QuitGroupResponse> quitGroupResponseObservable = null;
+//    private Observable<QuitGroupResponse> quitGroupResponseObservable = null;
 
     public SessionInfoAtPresenter(BaseActivity context, String sessionId, int conversationType) {
         super(context);
@@ -552,29 +541,29 @@ public class SessionInfoAtPresenter extends BasePresenter<ISessionInfoAtView> {
         etName.setText(mDisplayName);
         etName.setSelection(mDisplayName.length());
         view.findViewById(R.id.tvCancle).setOnClickListener(v -> mSetDisplayNameDialog.dismiss());
-        view.findViewById(R.id.tvOk).setOnClickListener(v -> {
-            String displayName = etName.getText().toString().trim();
-            if (!TextUtils.isEmpty(displayName)) {
-                ApiRetrofit.getInstance().setGroupDisplayName(mSessionId, displayName)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(setGroupDisplayNameResponse -> {
-                            if (setGroupDisplayNameResponse != null && setGroupDisplayNameResponse.getCode() == 200) {
-//                                Groups groups = DBManager.getInstance().getGroupsById(mSessionId);
-//                                if (groups != null) {
-//                                    groups.setDisplayName(displayName);
-//                                    groups.saveOrUpdate("groupid=?", groups.getGroupId());
-//                                    mDisplayName = displayName;
-//                                    getView().getOivNickNameInGroup().setRightText(mDisplayName);
-//                                }
-                                UIUtils.showToast(UIUtils.getString(R.string.change_success));
-                            } else {
-                                UIUtils.showToast(UIUtils.getString(R.string.change_fail));
-                            }
-                            mSetDisplayNameDialog.dismiss();
-                        }, this::setDisplayNameError);
-            }
-        });
+//        view.findViewById(R.id.tvOk).setOnClickListener(v -> {
+//            String displayName = etName.getText().toString().trim();
+//            if (!TextUtils.isEmpty(displayName)) {
+//                ApiRetrofit.getInstance().setGroupDisplayName(mSessionId, displayName)
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe(setGroupDisplayNameResponse -> {
+//                            if (setGroupDisplayNameResponse != null && setGroupDisplayNameResponse.getCode() == 200) {
+////                                Groups groups = DBManager.getInstance().getGroupsById(mSessionId);
+////                                if (groups != null) {
+////                                    groups.setDisplayName(displayName);
+////                                    groups.saveOrUpdate("groupid=?", groups.getGroupId());
+////                                    mDisplayName = displayName;
+////                                    getView().getOivNickNameInGroup().setRightText(mDisplayName);
+////                                }
+//                                UIUtils.showToast(UIUtils.getString(R.string.change_success));
+//                            } else {
+//                                UIUtils.showToast(UIUtils.getString(R.string.change_fail));
+//                            }
+//                            mSetDisplayNameDialog.dismiss();
+//                        }, this::setDisplayNameError);
+//            }
+//        });
         mSetDisplayNameDialog.show();
     }
 

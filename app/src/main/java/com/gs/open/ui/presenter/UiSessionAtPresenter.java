@@ -1,22 +1,18 @@
 package com.gs.open.ui.presenter;
 
 import android.content.Intent;
-import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gs.factory.common.data.DataSource;
-import com.gs.factory.data.helper.MessageHelper;
-import com.gs.factory.data.message.MessageGroupRepository;
-import com.gs.factory.data.message.MessageRepository;
-import com.gs.factory.model.api.message.MsgCreateModel;
-import com.gs.factory.model.db.Message;
-import com.gs.factory.persistence.Account;
-import com.gs.factory.manager.MyMessageHandler;
-import com.gs.open.manager.JsonMananger;
+import com.gs.im.common.data.DataSource;
+import com.gs.im.data.helper.MessageHelper;
+import com.gs.im.data.message.MessageGroupRepository;
+import com.gs.im.data.message.MessageRepository;
+import com.gs.im.model.api.message.MsgCreateModel;
+import com.gs.im.model.db.Message;
+import com.gs.im.manager.MyMessageHandler;
 //import com.gs.open.temp.Conversation;
 ////import com.gs.open.temp.FileMessage;
 ////import com.gs.open.temp.ImageMessage;
@@ -26,17 +22,13 @@ import com.gs.open.manager.JsonMananger;
 //import com.gs.open.temp.TextMessage;
 //import com.gs.open.temp.VoiceMessage;
 import com.gs.open.ui.adapter.UISessionAdapter;
-import com.lqr.audio.AudioPlayManager;
-import com.lqr.audio.IAudioPlayListener;
 import com.gs.open.R;
-import com.gs.open.model.data.LocationData;
+//import com.gs.open.delete.model.data.LocationData;
 import com.gs.open.ui.activity.ShowBigImageActivity;
 import com.gs.open.ui.base.BaseFragmentActivity;
 import com.gs.open.ui.base.BaseFragmentPresenter;
 import com.gs.open.ui.view.ISessionAtView;
-import com.gs.base.util.FileOpenUtils;
 import com.gs.base.util.LogUtils;
-import com.gs.base.util.MediaFileUtils;
 
 import com.gs.base.util.UIUtils;
 import com.gs.open.widget.CustomDialog;
@@ -353,7 +345,7 @@ public class UiSessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> 
         // 构建一个新的消息
         MsgCreateModel model = new MsgCreateModel.Builder()
                 .receiver(mSessionId, mConversationType)
-                .content(content, com.gs.factory.model.db.Message.TYPE_STR)
+                .content(content, com.gs.im.model.db.Message.TYPE_STR)
                 .build();
 
         // 进行网络发送
@@ -399,7 +391,7 @@ public class UiSessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> 
         // 构建一个新的消息
         MsgCreateModel model = new MsgCreateModel.Builder()
                 .receiver(mSessionId, mConversationType)
-                .content(imageFileSourceUri.toString(), com.gs.factory.model.db.Message.TYPE_PIC)
+                .content(imageFileSourceUri.toString(), com.gs.im.model.db.Message.TYPE_PIC)
                 .build();
 
         // 进行网络发送
@@ -457,7 +449,7 @@ public class UiSessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> 
         // 构建一个新的消息
         MsgCreateModel model = new MsgCreateModel.Builder()
                 .receiver(mSessionId, mConversationType)
-                .content(file.getAbsolutePath(), com.gs.factory.model.db.Message.TYPE_FILE)
+                .content(file.getAbsolutePath(), com.gs.im.model.db.Message.TYPE_FILE)
                 .build();
 
         // 进行网络发送
@@ -465,7 +457,7 @@ public class UiSessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> 
 
     }
 
-    public void sendLocationMessage(LocationData locationData) {
+//    public void sendLocationMessage(LocationData locationData) {
 //        LocationMessage message = LocationMessage.obtain(locationData.getLat(), locationData.getLng(), locationData.getPoi(), Uri.parse(locationData.getImgUrl()));
 //        RongIMClient.getInstance().sendLocationMessage(Message.obtain(mSessionId, mConversationType, message), mPushCotent, mPushData, new IRongCallback.ISendMessageCallback() {
 //            @Override
@@ -488,16 +480,16 @@ public class UiSessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> 
 //            }
 //        });
 
-        // 构建一个新的消息
-        MsgCreateModel model = new MsgCreateModel.Builder()
-                .receiver(mSessionId, mConversationType)
-                .content(JsonMananger.beanToJson(locationData), com.gs.factory.model.db.Message.TYPE_LOCATION)
-                .build();
+//        // 构建一个新的消息
+//        MsgCreateModel model = new MsgCreateModel.Builder()
+//                .receiver(mSessionId, mConversationType)
+//                .content(JsonMananger.beanToJson(locationData), com.gs.factory.model.db.Message.TYPE_LOCATION)
+//                .build();
+//
+//        // 进行网络发送
+//        MessageHelper.push(model);
 
-        // 进行网络发送
-        MessageHelper.push(model);
-
-    }
+//    }
 
     public void sendAudioFile(Uri audioPath, int duration) {
         if (audioPath != null) {
@@ -532,7 +524,7 @@ public class UiSessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> 
             // 构建一个新的消息
             MsgCreateModel model = new MsgCreateModel.Builder()
                     .receiver(mSessionId, mConversationType)
-                    .content(file.getAbsolutePath(), com.gs.factory.model.db.Message.TYPE_AUDIO)
+                    .content(file.getAbsolutePath(), com.gs.im.model.db.Message.TYPE_AUDIO)
                     .attach(String.valueOf(duration * 1000))
                     .build();
 
@@ -694,16 +686,16 @@ public class UiSessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> 
     public void getLocalHistoryMessage() {
         LogUtils.d("getLocalHistoryMessage:1 thread: " + Thread.currentThread().getName());
         if(mConversationType  == Message.RECEIVER_TYPE_NONE) {
-            messageRepository.getDataByDB(new DataSource.SucceedCallback<List<com.gs.factory.model.db.Message>>() {
+            messageRepository.getDataByDB(new DataSource.SucceedCallback<List<com.gs.im.model.db.Message>>() {
                 //此时是在子线程中执行的。
                 @Override
-                public void onDataLoaded(List<com.gs.factory.model.db.Message> messages) {
+                public void onDataLoaded(List<com.gs.im.model.db.Message> messages) {
                     LogUtils.d("getLocalHistoryMessage:12 thread: " + Thread.currentThread().getName());
 
                     //根据message的类型，判断是什么类型的message，然后再放到data中。
                     if (messages != null && messages.size() > 0) {
                         List<Message> messageList = new ArrayList<>();
-                        for (com.gs.factory.model.db.Message message : messages) {
+                        for (com.gs.im.model.db.Message message : messages) {
            //                 Message messageUI = toMessageUI(message);
                             if(message != null)
                                 messageList.add(message);
@@ -723,9 +715,9 @@ public class UiSessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> 
                 }
             });
         }else{
-            messageGroupRepository.getDataByDB(new DataSource.SucceedCallback<List<com.gs.factory.model.db.Message>>() {
+            messageGroupRepository.getDataByDB(new DataSource.SucceedCallback<List<com.gs.im.model.db.Message>>() {
                 @Override
-                public void onDataLoaded(List<com.gs.factory.model.db.Message> messages) {
+                public void onDataLoaded(List<com.gs.im.model.db.Message> messages) {
                     LogUtils.d("getLocalHistoryMessage:22 thread: " + Thread.currentThread().getName());
                     if (messages != null && messages.size() > 0) {
 //                        List<Message> messageList = new ArrayList<>();
@@ -749,9 +741,9 @@ public class UiSessionAtPresenter extends BaseFragmentPresenter<ISessionAtView> 
     }
 
     public void setListener(){
-        MyMessageHandler.getInstance().setMessageCallback(mSessionId, new DataSource.SucceedCallback<com.gs.factory.model.db.Message>() {
+        MyMessageHandler.getInstance().setMessageCallback(mSessionId, new DataSource.SucceedCallback<com.gs.im.model.db.Message>() {
             @Override
-            public void onDataLoaded(com.gs.factory.model.db.Message message) {
+            public void onDataLoaded(com.gs.im.model.db.Message message) {
                 //每次只有一个数据
        //         Message messageUI = toMessageUI(message);
                 if(message == null )

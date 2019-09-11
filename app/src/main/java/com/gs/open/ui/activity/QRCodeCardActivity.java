@@ -7,16 +7,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.gs.factory.data.helper.GroupHelper;
-import com.gs.factory.model.db.GroupMember;
-import com.gs.factory.model.db.User;
-import com.gs.factory.persistence.Account;
+import com.gs.im.data.helper.GroupHelper;
+import com.gs.im.model.db.GroupMember;
+import com.gs.im.model.db.User;
+import com.gs.im.persistence.Account;
 //import com.gs.open.temp.UserInfo;
 import com.lqr.ninegridimageview.LQRNineGridImageView;
 import com.lqr.ninegridimageview.LQRNineGridImageViewAdapter;
 import com.gs.open.R;
 import com.gs.open.app.AppConst;
-import com.gs.open.db.DBManager;
+//import com.gs.open.delete.db.DBManager;
 //import com.gs.open.db.model.GroupMember;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
@@ -76,14 +76,14 @@ public class QRCodeCardActivity extends BaseActivity {
         } else {
             mNgiv.setVisibility(View.VISIBLE);
             mIvHeader.setVisibility(View.GONE);
-            Observable.just(DBManager.getInstance().getGroupsById(mGroupId))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(groups -> {
-                        if (groups == null)
-                            return;
-                        mTvName.setText(groups.getName());
-                    });
+//            Observable.just(DBManager.getInstance().getGroupsById(mGroupId))
+//                    .subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe(groups -> {
+//                        if (groups == null)
+//                            return;
+//                        mTvName.setText(groups.getName());
+//                    });
             mNgiv.setAdapter(new LQRNineGridImageViewAdapter<GroupMember>() {
                 @Override
                 protected void onDisplayImage(Context context, ImageView imageView, GroupMember groupMember) {

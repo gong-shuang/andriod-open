@@ -3,7 +3,6 @@ package com.gs.open.ui.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,15 +14,12 @@ import com.gs.base.util.LogUtils;
 import com.gs.base.util.MediaFileUtils;
 import com.gs.base.util.TimeUtils;
 import com.gs.base.util.UIUtils;
-import com.gs.base.util.VideoThumbLoader;
-import com.gs.factory.data.helper.MessageHelper;
-import com.gs.factory.model.db.Message;
-import com.gs.factory.model.db.User;
-import com.gs.factory.persistence.Account;
-import com.gs.factory.utils.FileUtil;
+import com.gs.im.data.helper.MessageHelper;
+import com.gs.im.model.db.Message;
+import com.gs.im.model.db.User;
+import com.gs.im.persistence.Account;
 import com.gs.open.R;
 import com.gs.open.app.AppConst;
-import com.gs.open.db.DBManager;
 //import com.gs.open.temp.Conversation;
 //import com.gs.open.temp.FileMessage;
 //import com.gs.open.temp.ImageMessage;
@@ -37,12 +33,10 @@ import com.gs.open.ui.activity.UserInfoActivity;
 //import com.gs.open.ui.presenter.SessionAtPresenter;
 import com.gs.open.ui.presenter.UiSessionAtPresenter;
 import com.gs.open.widget.BubbleImageView;
-import com.gs.open.widget.CircularProgressBar;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;
 import com.lqr.emoji.MoonUtils;
 
-import java.io.File;
 import java.util.List;
 
 public class UISessionAdapter  extends LQRAdapterForRecyclerView<Message> {

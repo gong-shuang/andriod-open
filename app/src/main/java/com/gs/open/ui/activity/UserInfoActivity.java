@@ -1,7 +1,5 @@
 package com.gs.open.ui.activity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
@@ -16,16 +14,13 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.gs.factory.data.helper.UserHelper;
-import com.gs.factory.model.db.User;
-import com.gs.factory.persistence.Account;
+import com.gs.im.data.helper.UserHelper;
+import com.gs.im.model.db.User;
+import com.gs.im.persistence.Account;
 //import com.gs.open.temp.UserInfo;
 import com.lqr.optionitemview.OptionItemView;
 import com.gs.open.R;
-import com.gs.open.api.ApiRetrofit;
 import com.gs.open.app.AppConst;
-import com.gs.open.db.DBManager;
-import com.gs.open.db.model.Friend;
 import com.gs.open.manager.BroadcastManager;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
@@ -33,8 +28,6 @@ import com.gs.base.util.LogUtils;
 import com.gs.base.util.UIUtils;
 
 import butterknife.BindView;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * @创建者 CSDN_LQR

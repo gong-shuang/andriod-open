@@ -9,7 +9,7 @@ import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRHeaderAndFooterAdapter;
 import com.lqr.recyclerview.LQRRecyclerView;
 import com.gs.open.R;
-import com.gs.open.db.model.Friend;
+//import com.gs.open.delete.db.model.Friend;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.presenter.CreateGroupAtPresenter;
 import com.gs.open.ui.view.ICreateGroupAtView;
@@ -88,15 +88,15 @@ public class CreateGroupActivity extends BaseActivity<ICreateGroupAtView, Create
                 } else if ("☆".equalsIgnoreCase(letter)) {
                     mRvContacts.moveToPosition(0);
                 } else {
-                    List<Friend> data = ((LQRAdapterForRecyclerView) ((LQRHeaderAndFooterAdapter) mRvContacts.getAdapter()).getInnerAdapter()).getData();
-                    for (int i = 0; i < data.size(); i++) {
-                        Friend friend = data.get(i);
-                        String c = friend.getDisplayNameSpelling().charAt(0) + "";
-                        if (c.equalsIgnoreCase(letter)) {
-                            mRvContacts.moveToPosition(i);
-                            break;
-                        }
-                    }
+//                    List<Friend> data = ((LQRAdapterForRecyclerView) ((LQRHeaderAndFooterAdapter) mRvContacts.getAdapter()).getInnerAdapter()).getData();
+//                    for (int i = 0; i < data.size(); i++) {
+//                        Friend friend = data.get(i);
+//                        String c = friend.getDisplayNameSpelling().charAt(0) + "";
+//                        if (c.equalsIgnoreCase(letter)) {
+//                            mRvContacts.moveToPosition(i);
+//                            break;
+//                        }
+//                    }
                 }
             }
 

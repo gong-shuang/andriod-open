@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.gs.base.init.BaseApp;
-import com.gs.factory.Factory;
+import com.gs.im.Factory;
 import com.gs.open.push.AppMessageReceiverService;
 import com.gs.open.push.AppPushService;
 import com.igexin.sdk.PushManager;

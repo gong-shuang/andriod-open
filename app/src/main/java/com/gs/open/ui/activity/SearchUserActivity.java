@@ -1,9 +1,7 @@
 package com.gs.open.ui.activity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
@@ -13,17 +11,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.gs.factory.model.card.UserCard;
-import com.gs.factory.model.db.User;
+import com.gs.im.model.card.UserCard;
+import com.gs.im.model.db.User;
 import com.gs.open.R;
-import com.gs.open.db.DBManager;
 //import com.gs.open.db.model.Friend;
 //import com.gs.open.temp.UserInfo;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.presenter.SearchUserAtPresenter;
 import com.gs.open.ui.view.ISearchUserAtView;
-import com.gs.base.util.PinyinUtils;
-import com.gs.open.util.SortUtils;
 import com.gs.base.util.UIUtils;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;

@@ -6,22 +6,17 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.gs.factory.common.data.DataSource;
-import com.gs.factory.data.group.GroupsRepository;
-import com.gs.factory.data.helper.GroupHelper;
-import com.gs.factory.model.db.Group;
-import com.gs.factory.model.db.GroupMember;
-import com.gs.factory.persistence.Account;
-import com.gs.open.db.model.Friend;
+import com.gs.im.common.data.DataSource;
+import com.gs.im.data.group.GroupsRepository;
+import com.gs.im.data.helper.GroupHelper;
+import com.gs.im.model.db.Group;
+import com.gs.im.model.db.GroupMember;
 import com.gs.base.util.LogUtils;
-import com.gs.base.util.PinyinUtils;
-import com.gs.base.util.UIUtils;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;
 import com.lqr.ninegridimageview.LQRNineGridImageView;
 import com.lqr.ninegridimageview.LQRNineGridImageViewAdapter;
 import com.gs.open.R;
-import com.gs.open.db.DBManager;
 //import com.gs.open.db.model.GroupMember;
 //import com.gs.open.db.model.Groups;
 import com.gs.open.ui.activity.SessionActivity;
@@ -110,9 +105,9 @@ public class GroupListAtPresenter extends BasePresenter<IGroupListAtView> {
                     });
 
                     //更新群成员的信息
-                    List<com.gs.factory.model.db.GroupMember> models = GroupHelper.getMemberUsersAll();
+                    List<com.gs.im.model.db.GroupMember> models = GroupHelper.getMemberUsersAll();
                     LogUtils.e("All group member,count= " + models.size());
-                    for(com.gs.factory.model.db.GroupMember member : models){
+                    for(com.gs.im.model.db.GroupMember member : models){
                         if(member.getGroup() != null || member.getUser() != null){
                             //保存到数据库
 //                            DBManager.getInstance().saveOrUpdateGroupMember(toGroupMember(member));

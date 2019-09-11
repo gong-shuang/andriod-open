@@ -1,8 +1,8 @@
 package com.gs.open.ui.presenter;
 
-import com.gs.factory.common.data.DataSource;
-import com.gs.factory.data.helper.UserHelper;
-import com.gs.factory.model.card.UserCard;
+import com.gs.im.common.data.DataSource;
+import com.gs.im.data.helper.UserHelper;
+import com.gs.im.model.card.UserCard;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.IPostScriptAtView;

@@ -3,7 +3,7 @@ package com.gs.open.ui.activity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.gs.factory.persistence.Account;
+import com.gs.im.persistence.Account;
 import com.gs.open.R;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.presenter.AddFriendAtPresenter;

@@ -2,7 +2,6 @@ package com.gs.open.ui.presenter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.view.View;
@@ -10,19 +9,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.gs.factory.common.data.DataSource;
-import com.gs.factory.data.helper.DbHelper;
-import com.gs.factory.data.helper.GroupHelper;
-import com.gs.factory.data.helper.MessageHelper;
-import com.gs.factory.data.helper.UserHelper;
-import com.gs.factory.data.message.SessionRepository;
-import com.gs.factory.manager.MyMessageHandler;
-import com.gs.factory.model.db.GroupMember;
-import com.gs.factory.model.db.Message;
-import com.gs.factory.model.db.Session;
-import com.gs.factory.model.db.User;
-import com.gs.factory.persistence.Account;
-import com.gs.open.db.model.Friend;
+import com.gs.im.common.data.DataSource;
+import com.gs.im.data.helper.DbHelper;
+import com.gs.im.data.helper.GroupHelper;
+import com.gs.im.data.helper.UserHelper;
+import com.gs.im.data.message.SessionRepository;
+import com.gs.im.model.db.GroupMember;
+import com.gs.im.model.db.Message;
+import com.gs.im.model.db.Session;
+import com.gs.im.model.db.User;
 //import com.gs.open.temp.Conversation;
 //import com.gs.open.temp.FileMessage;
 //import com.gs.open.temp.ImageMessage;
@@ -36,7 +31,6 @@ import com.lqr.emoji.MoonUtils;
 import com.lqr.ninegridimageview.LQRNineGridImageView;
 import com.lqr.ninegridimageview.LQRNineGridImageViewAdapter;
 import com.gs.open.R;
-import com.gs.open.db.DBManager;
 //import com.gs.open.db.model.GroupMember;
 //import com.gs.open.db.model.Groups;
 import com.gs.open.ui.activity.MainActivity;
@@ -289,7 +283,7 @@ public class RecentMessageFgPresenter extends BasePresenter<IRecentMessageFgView
                         //九宫格头像
                         LQRNineGridImageView ngiv = helper.getView(R.id.ngiv);
                         ngiv.setAdapter(mNgivAdapter);
-                        List<com.gs.factory.model.db.GroupMember> groupMembers = GroupHelper.getMemberFromGroup(item.getId());
+                        List<com.gs.im.model.db.GroupMember> groupMembers = GroupHelper.getMemberFromGroup(item.getId());
                         ngiv.setImagesData(groupMembers);
                         //群昵称
                         helper.setText(R.id.tvDisplayName, item.getTitle())

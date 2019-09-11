@@ -8,9 +8,9 @@ import com.igexin.sdk.message.GTCmdMessage;
 import com.igexin.sdk.message.GTNotificationMessage;
 import com.igexin.sdk.message.GTTransmitMessage;
 
-import com.gs.factory.Factory;
-import com.gs.factory.data.helper.AccountHelper;
-import com.gs.factory.persistence.Account;
+import com.gs.im.Factory;
+import com.gs.im.data.helper.AccountHelper;
+import com.gs.im.persistence.Account;
 
 /**
  * 个推接收消息的IntentService，用以接收具体的消息信息

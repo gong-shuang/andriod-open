@@ -6,23 +6,21 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.gs.factory.common.data.DataSource;
-import com.gs.factory.data.helper.UserHelper;
-import com.gs.factory.data.user.ContactRepository;
-import com.gs.factory.model.db.User;
+import com.gs.im.common.data.DataSource;
+import com.gs.im.data.helper.UserHelper;
+import com.gs.im.data.user.ContactRepository;
+import com.gs.im.model.db.User;
 import com.gs.base.util.PinyinUtils;
 import com.lqr.adapter.LQRAdapterForRecyclerView;
 import com.lqr.adapter.LQRHeaderAndFooterAdapter;
 import com.lqr.adapter.LQRViewHolderForRecyclerView;
 import com.gs.open.R;
-import com.gs.open.db.DBManager;
 //import com.gs.open.db.model.Friend;
 import com.gs.open.ui.activity.UserInfoActivity;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.IContactsFgView;
 import com.gs.base.util.LogUtils;
-import com.gs.open.util.SortUtils;
 import com.gs.base.util.UIUtils;
 
 import net.qiujuer.genius.kit.handler.Run;

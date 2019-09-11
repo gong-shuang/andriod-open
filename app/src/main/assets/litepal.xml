@@ -5,8 +5,8 @@
     <version value="1"></version>
 
     <list>
-        <mapping class="com.gs.open.db.model.Friend"></mapping>
-        <mapping class="com.gs.open.db.model.Groups"></mapping>
-        <mapping class="com.gs.open.db.model.GroupMember"></mapping>
+        <mapping class="com.gs.open.delete.db.model.Friend"></mapping>
+        <mapping class="com.gs.open.delete.db.model.Groups"></mapping>
+        <mapping class="com.gs.open.delete.db.model.GroupMember"></mapping>
     </list>
 </litepal>

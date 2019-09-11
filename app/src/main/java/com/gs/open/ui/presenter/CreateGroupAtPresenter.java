@@ -1,32 +1,21 @@
 package com.gs.open.ui.presenter;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.text.TextUtils;
-import android.view.View;
-import android.widget.CheckBox;
-import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.gs.factory.common.data.DataSource;
-import com.gs.factory.data.helper.GroupHelper;
-import com.gs.factory.model.api.group.GroupCreateModel;
-import com.gs.factory.model.card.GroupCard;
-import com.gs.factory.persistence.Account;
-import com.lqr.adapter.LQRAdapterForRecyclerView;
+import com.gs.im.common.data.DataSource;
+import com.gs.im.data.helper.GroupHelper;
+import com.gs.im.model.api.group.GroupCreateModel;
+import com.gs.im.model.card.GroupCard;
+import com.gs.im.persistence.Account;
 import com.lqr.adapter.LQRHeaderAndFooterAdapter;
-import com.lqr.adapter.LQRViewHolderForRecyclerView;
-import com.gs.open.R;
-import com.gs.open.db.DBManager;
-import com.gs.open.db.model.Friend;
+//import com.gs.open.delete.db.DBManager;
+//import com.gs.open.delete.db.model.Friend;
 //import com.gs.open.db.model.Groups;
-import com.gs.open.ui.activity.CreateGroupActivity;
 import com.gs.open.ui.activity.SessionActivity;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.ICreateGroupAtView;
 import com.gs.base.util.LogUtils;
-import com.gs.open.util.SortUtils;
 import com.gs.base.util.UIUtils;
 
 import net.qiujuer.genius.kit.handler.Run;
@@ -34,12 +23,7 @@ import net.qiujuer.genius.kit.handler.runable.Action;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * 现在的群有几个问题，
@@ -48,10 +32,10 @@ import rx.schedulers.Schedulers;
 public class CreateGroupAtPresenter extends BasePresenter<ICreateGroupAtView> {
 
     private String mGroupName = "";
-    private List<Friend> mData = new ArrayList<>();
-    private List<Friend> mSelectedData = new ArrayList<>();
+//    private List<Friend> mData = new ArrayList<>();
+//    private List<Friend> mSelectedData = new ArrayList<>();
     private LQRHeaderAndFooterAdapter mAdapter;
-    private LQRAdapterForRecyclerView<Friend> mSelectedAdapter;
+//    private LQRAdapterForRecyclerView<Friend> mSelectedAdapter;
 
     public CreateGroupAtPresenter(BaseActivity context) {
         super(context);
@@ -65,175 +49,175 @@ public class CreateGroupAtPresenter extends BasePresenter<ICreateGroupAtView> {
 
     private void loadData() {
         // rxjava 实现从数据库中获取
-        Observable.just(DBManager.getInstance().getFriends())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(friends -> {
-                    if (friends != null && friends.size() > 0) {
-                        mData.clear();
-                        mData.addAll(friends);
-                        //整理排序
-                        SortUtils.sortContacts(mData);
-                        LogUtils.d("mAdapter:" + mAdapter);
-                        if (mAdapter != null)
-                            mAdapter.notifyDataSetChanged();
-                        LogUtils.d("mAdapter1:" + mAdapter);
-                    }
-                }, this::loadError);
+//        Observable.just(DBManager.getInstance().getFriends())
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(friends -> {
+//                    if (friends != null && friends.size() > 0) {
+//                        mData.clear();
+//                        mData.addAll(friends);
+//                        //整理排序
+//                        SortUtils.sortContacts(mData);
+//                        LogUtils.d("mAdapter:" + mAdapter);
+//                        if (mAdapter != null)
+//                            mAdapter.notifyDataSetChanged();
+//                        LogUtils.d("mAdapter1:" + mAdapter);
+//                    }
+//                }, this::loadError);
     }
 
     private void setAdapter() {
         if (mAdapter == null) {
-            LQRAdapterForRecyclerView adapter = new LQRAdapterForRecyclerView<Friend>(mContext, mData, R.layout.item_contact) {
-                @Override
-                public void convert(LQRViewHolderForRecyclerView helper, Friend item, int position) {
-                    helper.setText(R.id.tvName, item.getDisplayName()).setViewVisibility(R.id.cb, View.VISIBLE);
-                    ImageView ivHeader = helper.getView(R.id.ivHeader);
-                    Glide.with(mContext).load(item.getPortraitUri()).centerCrop().into(ivHeader);
-                    CheckBox cb = helper.getView(R.id.cb);
-
-                    //如果添加群成员的话，需要判断是否已经在群中
-                    if (((CreateGroupActivity) mContext).mSelectedTeamMemberAccounts != null &&
-                            ((CreateGroupActivity) mContext).mSelectedTeamMemberAccounts.contains(item.getUserId())) {
-                        cb.setChecked(true);
-                        helper.setEnabled(R.id.cb, false).setEnabled(R.id.root, false);
-                    } else {
-                        helper.setEnabled(R.id.cb, true).setEnabled(R.id.root, true);
-                        //没有在已有群中的联系人，根据当前的选中结果判断
-                        cb.setChecked(mSelectedData.contains(item) ? true : false);
-                    }
-
-                    if(item.getDisplayNameSpelling()  == null )
-                        return;
-
-                    String str = "";
-                    //得到当前字母
-                    String currentLetter = item.getDisplayNameSpelling().charAt(0) + "";
-                    if (position == 0) {
-                        str = currentLetter;
-                    } else {
-                        if(mData.get(position - 1).getDisplayNameSpelling() == null )
-                            return;
-
-                        //得到上一个字母
-                        String preLetter = mData.get(position - 1).getDisplayNameSpelling().charAt(0) + "";
-                        //如果和上一个字母的首字母不同则显示字母栏
-                        if (!preLetter.equalsIgnoreCase(currentLetter)) {
-                            str = currentLetter;
-                        }
-
-                        int nextIndex = position + 1;
-                        if (nextIndex < mData.size() - 1) {
-                            //得到下一个字母
-                            String nextLetter = mData.get(nextIndex).getDisplayNameSpelling().charAt(0) + "";
-                            //如果和下一个字母的首字母不同则隐藏下划线
-                            if (!nextLetter.equalsIgnoreCase(currentLetter)) {
-                                helper.setViewVisibility(R.id.vLine, View.VISIBLE);
-                            } else {
-                                helper.setViewVisibility(R.id.vLine, View.VISIBLE);
-                            }
-                        } else {
-                            helper.setViewVisibility(R.id.vLine, View.INVISIBLE);
-                        }
-                    }
-                    if (position == mData.size() - 1) {
-                        helper.setViewVisibility(R.id.vLine, View.GONE);
-                    }
-
-                    //根据str是否为空决定字母栏是否显示
-                    if (TextUtils.isEmpty(str)) {
-                        helper.setViewVisibility(R.id.tvIndex, View.GONE);
-                    } else {
-                        helper.setViewVisibility(R.id.tvIndex, View.VISIBLE);
-                        helper.setText(R.id.tvIndex, str);
-                    }
-                }
-            };
-            adapter.addHeaderView(getView().getHeaderView());
-            mAdapter = adapter.getHeaderAndFooterAdapter();
-            getView().getRvContacts().setAdapter(mAdapter);
-
-            ((LQRAdapterForRecyclerView) mAdapter.getInnerAdapter()).setOnItemClickListener((lqrViewHolder, viewGroup, view, i) -> {
-                //选中或反选
-                Friend friend = mData.get(i - 1);
-                if (mSelectedData.contains(friend)) {
-                    mSelectedData.remove(friend);
-                } else {
-                    mSelectedData.add(friend);
-                }
-                mSelectedAdapter.notifyDataSetChangedWrapper();
-                mAdapter.notifyDataSetChanged();
-                if (mSelectedData.size() > 0) {
-                    getView().getBtnToolbarSend().setEnabled(true);
-                    getView().getBtnToolbarSend().setText(UIUtils.getString(R.string.sure_with_count, mSelectedData.size()));
-                } else {
-                    getView().getBtnToolbarSend().setEnabled(false);
-                    getView().getBtnToolbarSend().setText(UIUtils.getString(R.string.sure));
-                }
-            });
+//            LQRAdapterForRecyclerView adapter = new LQRAdapterForRecyclerView<Friend>(mContext, mData, R.layout.item_contact) {
+//                @Override
+//                public void convert(LQRViewHolderForRecyclerView helper, Friend item, int position) {
+//                    helper.setText(R.id.tvName, item.getDisplayName()).setViewVisibility(R.id.cb, View.VISIBLE);
+//                    ImageView ivHeader = helper.getView(R.id.ivHeader);
+//                    Glide.with(mContext).load(item.getPortraitUri()).centerCrop().into(ivHeader);
+//                    CheckBox cb = helper.getView(R.id.cb);
+//
+//                    //如果添加群成员的话，需要判断是否已经在群中
+//                    if (((CreateGroupActivity) mContext).mSelectedTeamMemberAccounts != null &&
+//                            ((CreateGroupActivity) mContext).mSelectedTeamMemberAccounts.contains(item.getUserId())) {
+//                        cb.setChecked(true);
+//                        helper.setEnabled(R.id.cb, false).setEnabled(R.id.root, false);
+//                    } else {
+//                        helper.setEnabled(R.id.cb, true).setEnabled(R.id.root, true);
+//                        //没有在已有群中的联系人，根据当前的选中结果判断
+//                        cb.setChecked(mSelectedData.contains(item) ? true : false);
+//                    }
+//
+//                    if(item.getDisplayNameSpelling()  == null )
+//                        return;
+//
+//                    String str = "";
+//                    //得到当前字母
+//                    String currentLetter = item.getDisplayNameSpelling().charAt(0) + "";
+//                    if (position == 0) {
+//                        str = currentLetter;
+//                    } else {
+//                        if(mData.get(position - 1).getDisplayNameSpelling() == null )
+//                            return;
+//
+//                        //得到上一个字母
+//                        String preLetter = mData.get(position - 1).getDisplayNameSpelling().charAt(0) + "";
+//                        //如果和上一个字母的首字母不同则显示字母栏
+//                        if (!preLetter.equalsIgnoreCase(currentLetter)) {
+//                            str = currentLetter;
+//                        }
+//
+//                        int nextIndex = position + 1;
+//                        if (nextIndex < mData.size() - 1) {
+//                            //得到下一个字母
+//                            String nextLetter = mData.get(nextIndex).getDisplayNameSpelling().charAt(0) + "";
+//                            //如果和下一个字母的首字母不同则隐藏下划线
+//                            if (!nextLetter.equalsIgnoreCase(currentLetter)) {
+//                                helper.setViewVisibility(R.id.vLine, View.VISIBLE);
+//                            } else {
+//                                helper.setViewVisibility(R.id.vLine, View.VISIBLE);
+//                            }
+//                        } else {
+//                            helper.setViewVisibility(R.id.vLine, View.INVISIBLE);
+//                        }
+//                    }
+//                    if (position == mData.size() - 1) {
+//                        helper.setViewVisibility(R.id.vLine, View.GONE);
+//                    }
+//
+//                    //根据str是否为空决定字母栏是否显示
+//                    if (TextUtils.isEmpty(str)) {
+//                        helper.setViewVisibility(R.id.tvIndex, View.GONE);
+//                    } else {
+//                        helper.setViewVisibility(R.id.tvIndex, View.VISIBLE);
+//                        helper.setText(R.id.tvIndex, str);
+//                    }
+//                }
+//            };
+//            adapter.addHeaderView(getView().getHeaderView());
+//            mAdapter = adapter.getHeaderAndFooterAdapter();
+//            getView().getRvContacts().setAdapter(mAdapter);
+//
+//            ((LQRAdapterForRecyclerView) mAdapter.getInnerAdapter()).setOnItemClickListener((lqrViewHolder, viewGroup, view, i) -> {
+//                //选中或反选
+//                Friend friend = mData.get(i - 1);
+//                if (mSelectedData.contains(friend)) {
+//                    mSelectedData.remove(friend);
+//                } else {
+//                    mSelectedData.add(friend);
+//                }
+//                mSelectedAdapter.notifyDataSetChangedWrapper();
+//                mAdapter.notifyDataSetChanged();
+//                if (mSelectedData.size() > 0) {
+//                    getView().getBtnToolbarSend().setEnabled(true);
+//                    getView().getBtnToolbarSend().setText(UIUtils.getString(R.string.sure_with_count, mSelectedData.size()));
+//                } else {
+//                    getView().getBtnToolbarSend().setEnabled(false);
+//                    getView().getBtnToolbarSend().setText(UIUtils.getString(R.string.sure));
+//                }
+//            });
         }
     }
 
     private void setSelectedAdapter() {
-        if (mSelectedAdapter == null) {
-            mSelectedAdapter = new LQRAdapterForRecyclerView<Friend>(mContext, mSelectedData, R.layout.item_selected_contact) {
-                @Override
-                public void convert(LQRViewHolderForRecyclerView helper, Friend item, int position) {
-                    ImageView ivHeader = helper.getView(R.id.ivHeader);
-                    Glide.with(mContext).load(item.getPortraitUri()).centerCrop().into(ivHeader);
-                }
-            };
-            getView().getRvSelectedContacts().setAdapter(mSelectedAdapter);
-        }
+//        if (mSelectedAdapter == null) {
+//            mSelectedAdapter = new LQRAdapterForRecyclerView<Friend>(mContext, mSelectedData, R.layout.item_selected_contact) {
+//                @Override
+//                public void convert(LQRViewHolderForRecyclerView helper, Friend item, int position) {
+//                    ImageView ivHeader = helper.getView(R.id.ivHeader);
+//                    Glide.with(mContext).load(item.getPortraitUri()).centerCrop().into(ivHeader);
+//                }
+//            };
+//            getView().getRvSelectedContacts().setAdapter(mSelectedAdapter);
+//        }
     }
 
     /**
      * 还没实现
      */
     public void addGroupMembers() {
-        if(mSelectedData.size() == 0)
-            return;
-        ArrayList<String> selectedIds = new ArrayList<>(mSelectedData.size());
-        for (int i = 0; i < mSelectedData.size(); i++) {
-            Friend friend = mSelectedData.get(i);
-            selectedIds.add(friend.getUserId());
-        }
-        Intent data = new Intent();
-        data.putStringArrayListExtra("selectedIds", selectedIds);
-        mContext.setResult(Activity.RESULT_OK, data);
-        mContext.finish();
+//        if(mSelectedData.size() == 0)
+//            return;
+//        ArrayList<String> selectedIds = new ArrayList<>(mSelectedData.size());
+//        for (int i = 0; i < mSelectedData.size(); i++) {
+//            Friend friend = mSelectedData.get(i);
+//            selectedIds.add(friend.getUserId());
+//        }
+//        Intent data = new Intent();
+//        data.putStringArrayListExtra("selectedIds", selectedIds);
+//        mContext.setResult(Activity.RESULT_OK, data);
+//        mContext.finish();
     }
 
     //创建群
     public void createGroup() {
-        if (mSelectedData.size() == 0)
-            return;
-
-        //群成员中，是不应该有自己的，自己的操作放在服务器端完成，这里如果发现有自己，就将自己移除
-        //判断是否有自己
-        int index = mSelectedData.indexOf(DBManager.getInstance().getFriendById(Account.getUserId()));
-        if( index >= 0){
-            //如果有，将自己移除
-            mSelectedData.remove(index);
-        }
-
-        int size = mSelectedData.size();
-        List<String> selectedIds = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            Friend friend = mSelectedData.get(i);
-            selectedIds.add(friend.getUserId());
-        }
-        mGroupName = "";
-        if (size > 3) {
-            for (int i = 0; i < 3; i++) {
-                Friend friend = mSelectedData.get(i);
-                mGroupName += friend.getName() + "、";
-            }
-        } else {
-            for (Friend friend : mSelectedData) {
-                mGroupName += friend.getName() + "、";
-            }
-        }
+//        if (mSelectedData.size() == 0)
+//            return;
+//
+//        //群成员中，是不应该有自己的，自己的操作放在服务器端完成，这里如果发现有自己，就将自己移除
+//        //判断是否有自己
+//        int index = mSelectedData.indexOf(DBManager.getInstance().getFriendById(Account.getUserId()));
+//        if( index >= 0){
+//            //如果有，将自己移除
+//            mSelectedData.remove(index);
+//        }
+//
+//        int size = mSelectedData.size();
+//        List<String> selectedIds = new ArrayList<>(size);
+//        for (int i = 0; i < size; i++) {
+//            Friend friend = mSelectedData.get(i);
+//            selectedIds.add(friend.getUserId());
+//        }
+//        mGroupName = "";
+//        if (size > 3) {
+//            for (int i = 0; i < 3; i++) {
+//                Friend friend = mSelectedData.get(i);
+//                mGroupName += friend.getName() + "、";
+//            }
+//        } else {
+//            for (Friend friend : mSelectedData) {
+//                mGroupName += friend.getName() + "、";
+//            }
+//        }
         mGroupName = mGroupName.substring(0, mGroupName.length() - 1);
 
 //        mContext.showWaitingDialog(UIUtils.getString(R.string.please_wait));
@@ -258,9 +242,9 @@ public class CreateGroupAtPresenter extends BasePresenter<ICreateGroupAtView> {
 //                }, this::loadError);
 
         Set<String> users = new HashSet<>();
-        for(String id: selectedIds){
-            users.add(id);
-        }
+//        for(String id: selectedIds){
+//            users.add(id);
+//        }
 
         // 进行网络请求
         GroupCreateModel model = new GroupCreateModel(mGroupName, mGroupName, Account.getUser().getPortrait(), users);

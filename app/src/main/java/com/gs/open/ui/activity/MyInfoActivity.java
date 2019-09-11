@@ -10,8 +10,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
-import com.gs.factory.common.app.Application;
-import com.gs.factory.common.ui.media.GalleryFragment;
+import com.gs.im.common.app.Application;
+import com.gs.im.common.ui.media.GalleryFragment;
 import com.gs.base.util.UIUtils;
 import com.lqr.optionitemview.OptionItemView;
 import com.gs.open.R;

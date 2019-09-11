@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 ////import com.gs.open.temp.UserInfo;
-import com.gs.factory.model.db.User;
+import com.gs.im.model.db.User;
 import com.lqr.optionitemview.OptionItemView;
 import com.gs.open.R;
 import com.gs.open.app.AppConst;

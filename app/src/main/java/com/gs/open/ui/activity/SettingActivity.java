@@ -2,13 +2,13 @@ package com.gs.open.ui.activity;
 
 import android.view.View;
 
-import com.gs.factory.Factory;
-import com.gs.factory.persistence.Account;
+import com.gs.im.Factory;
+import com.gs.im.persistence.Account;
 import com.lqr.optionitemview.OptionItemView;
 import com.gs.open.R;
 import com.gs.open.app.AppConst;
 import com.gs.open.app.MyApp;
-import com.gs.open.model.cache.UserCache;
+//import com.gs.open.delete.model.cache.UserCache;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.widget.CustomDialog;
@@ -41,7 +41,7 @@ public class SettingActivity extends BaseActivity {
                 mExitDialog = new CustomDialog(this, mExitView, R.style.MyDialog);
                 mExitView.findViewById(R.id.tvExitAccount).setOnClickListener(v1 -> {
  //                   RongIMClient.getInstance().logout();
-                    UserCache.clear();
+//                    UserCache.clear(); //清除user信息
                     Account.clear(Factory.app());  // 清除 xml 文件
                     mExitDialog.dismiss();
                     MyApp.exit();

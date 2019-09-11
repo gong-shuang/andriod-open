@@ -2,11 +2,11 @@ package com.gs.open.ui.presenter;
 
 import android.text.TextUtils;
 
-import com.gs.factory.common.data.DataSource;
-import com.gs.factory.data.helper.AccountHelper;
-import com.gs.factory.model.api.account.LoginModel;
-import com.gs.factory.model.db.User;
-import com.gs.factory.persistence.Account;
+import com.gs.im.common.data.DataSource;
+import com.gs.im.data.helper.AccountHelper;
+import com.gs.im.model.api.account.LoginModel;
+import com.gs.im.model.db.User;
+import com.gs.im.persistence.Account;
 import com.gs.open.R;
 import com.gs.open.ui.activity.MainActivity;
 import com.gs.open.ui.base.BaseActivity;

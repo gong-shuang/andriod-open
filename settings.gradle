@@ -1,2 +1,2 @@
-include ':app', ':library', ':factory', ':im', ':base'
+include ':app', ':library', ':im', ':base'
 rootProject.name='open'

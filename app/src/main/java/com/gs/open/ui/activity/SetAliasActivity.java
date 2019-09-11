@@ -8,10 +8,10 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.gs.open.R;
-import com.gs.open.api.ApiRetrofit;
+//import com.gs.open.delete.ApiRetrofit;
 import com.gs.open.app.AppConst;
-import com.gs.open.db.DBManager;
-import com.gs.open.db.model.Friend;
+//import com.gs.open.delete.db.DBManager;
+//import com.gs.open.delete.db.model.Friend;
 import com.gs.open.manager.BroadcastManager;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
@@ -31,7 +31,7 @@ import rx.schedulers.Schedulers;
 public class SetAliasActivity extends BaseActivity {
 
     private String mFriendId;
-    private Friend mFriend;
+//    private Friend mFriend;
 
     @BindView(R.id.btnToolbarSend)
     Button mBtnToolbarSend;
@@ -56,9 +56,9 @@ public class SetAliasActivity extends BaseActivity {
 
     @Override
     public void initData() {
-        mFriend = DBManager.getInstance().getFriendById(mFriendId);
-        if (mFriend != null)
-            mEtAlias.setText(mFriend.getDisplayName());
+//        mFriend = DBManager.getInstance().getFriendById(mFriendId);
+//        if (mFriend != null)
+//            mEtAlias.setText(mFriend.getDisplayName());
         mEtAlias.setSelection(mEtAlias.getText().toString().trim().length());
     }
 
@@ -89,27 +89,27 @@ public class SetAliasActivity extends BaseActivity {
             }
 
             showWaitingDialog(UIUtils.getString(R.string.please_wait));
-            ApiRetrofit.getInstance().setFriendDisplayName(mFriendId, displayName)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(setFriendDisplayNameResponse -> {
-                        if (setFriendDisplayNameResponse.getCode() == 200) {
-                            UIUtils.showToast(UIUtils.getString(R.string.change_success));
-
-                            //更新本地好友数据库
-                            mFriend.setDisplayName(displayName);
-                            mFriend.setDisplayNameSpelling(PinyinUtils.getPinyin(displayName));
-                            DBManager.getInstance().saveOrUpdateFriend(mFriend);
-                            BroadcastManager.getInstance(SetAliasActivity.this).sendBroadcast(AppConst.UPDATE_FRIEND);
-                            BroadcastManager.getInstance(SetAliasActivity.this).sendBroadcast(AppConst.CHANGE_INFO_FOR_USER_INFO);
-
-                            finish();
-
-                        } else {
-                            UIUtils.showToast(UIUtils.getString(R.string.change_fail));
-                        }
-                        hideWaitingDialog();
-                    }, this::changeError);
+//            ApiRetrofit.getInstance().setFriendDisplayName(mFriendId, displayName)
+//                    .subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe(setFriendDisplayNameResponse -> {
+//                        if (setFriendDisplayNameResponse.getCode() == 200) {
+//                            UIUtils.showToast(UIUtils.getString(R.string.change_success));
+//
+//                            //更新本地好友数据库
+//                            mFriend.setDisplayName(displayName);
+//                            mFriend.setDisplayNameSpelling(PinyinUtils.getPinyin(displayName));
+//                            DBManager.getInstance().saveOrUpdateFriend(mFriend);
+//                            BroadcastManager.getInstance(SetAliasActivity.this).sendBroadcast(AppConst.UPDATE_FRIEND);
+//                            BroadcastManager.getInstance(SetAliasActivity.this).sendBroadcast(AppConst.CHANGE_INFO_FOR_USER_INFO);
+//
+//                            finish();
+//
+//                        } else {
+//                            UIUtils.showToast(UIUtils.getString(R.string.change_fail));
+//                        }
+//                        hideWaitingDialog();
+//                    }, this::changeError);
         });
     }
 

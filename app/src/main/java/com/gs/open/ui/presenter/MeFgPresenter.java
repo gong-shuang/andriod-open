@@ -1,22 +1,14 @@
 package com.gs.open.ui.presenter;
 
-import android.net.Uri;
-import android.text.TextUtils;
-
 import com.bumptech.glide.Glide;
-import com.gs.factory.data.helper.UserHelper;
-import com.gs.factory.model.db.User;
-import com.gs.factory.persistence.Account;
-import com.gs.open.db.DBManager;
-import com.gs.open.db.model.Friend;
-import com.gs.open.model.cache.UserCache;
+import com.gs.im.data.helper.UserHelper;
+import com.gs.im.model.db.User;
+import com.gs.im.persistence.Account;
 ////import com.gs.open.temp.UserInfo;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.IMeFgView;
 import com.gs.base.util.LogUtils;
-import com.gs.base.util.PinyinUtils;
-import com.gs.open.util.RongGenerate;
 import com.gs.base.util.UIUtils;
 
 

@@ -1,7 +1,5 @@
 package com.gs.open.ui.activity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.text.Editable;
@@ -24,12 +22,12 @@ import android.widget.TextView;
 //import com.gs.open.temp.UserInfo;
 import com.gs.base.util.LogUtils;
 //import com.gs.open.temp.Message;
-import com.gs.factory.data.helper.GroupHelper;
-import com.gs.factory.data.helper.UserHelper;
-import com.gs.factory.model.db.Group;
-import com.gs.factory.model.db.GroupMember;
-import com.gs.factory.model.db.Message;
-import com.gs.factory.model.db.User;
+import com.gs.im.data.helper.GroupHelper;
+import com.gs.im.data.helper.UserHelper;
+import com.gs.im.model.db.Group;
+import com.gs.im.model.db.GroupMember;
+import com.gs.im.model.db.Message;
+import com.gs.im.model.db.User;
 import com.lqr.audio.AudioRecordManager;
 import com.lqr.audio.IAudioRecordListener;
 import com.lqr.emoji.EmotionKeyboard;
@@ -43,10 +41,9 @@ import com.lqr.imagepicker.ui.ImagePreviewActivity;
 import com.lqr.recyclerview.LQRRecyclerView;
 import com.gs.open.R;
 import com.gs.open.app.AppConst;
-import com.gs.open.db.DBManager;
 //import com.gs.open.db.model.Groups;
 import com.gs.open.manager.BroadcastManager;
-import com.gs.open.model.data.LocationData;
+//import com.gs.open.delete.model.data.LocationData;
 import com.gs.open.ui.base.BaseFragmentActivity;
 import com.gs.open.ui.presenter.UiSessionAtPresenter;
 import com.gs.open.ui.view.ISessionAtView;
@@ -487,8 +484,8 @@ public class SessionActivity extends BaseFragmentActivity<ISessionAtView, UiSess
                 break;
             case REQUEST_MY_LOCATION:
                 if (resultCode == RESULT_OK) {
-                    LocationData locationData = (LocationData) data.getSerializableExtra("location");
-                    mPresenter.sendLocationMessage(locationData);
+//                    LocationData locationData = (LocationData) data.getSerializableExtra("location");
+//                    mPresenter.sendLocationMessage(locationData);
                 }
                 break;
         }
