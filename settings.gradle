@@ -1,2 +1,2 @@
-include ':app', ':library', ':im', ':base'
+include ':app', ':library', ':im', ':base', ':IMSDK'
 rootProject.name='open'

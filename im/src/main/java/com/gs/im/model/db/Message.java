@@ -25,11 +25,11 @@ public class Message extends BaseDbModel<Message> implements Serializable {
     public static final int RECEIVER_TYPE_GROUP = 2;  //群
 
     // 普通消息类型
-    public static final int TYPE_STR = 1;
-    public static final int TYPE_PIC = 2;
-    public static final int TYPE_FILE = 3;
-    public static final int TYPE_AUDIO = 4;
-    public static final int TYPE_VIDEO = 5;
+    public static final int TYPE_STR = 1;  //文字
+    public static final int TYPE_PIC = 2;  //图片
+    public static final int TYPE_FILE = 3; //文件
+    public static final int TYPE_AUDIO = 4; //语音
+    public static final int TYPE_VIDEO = 5; //视频
     public static final int TYPE_LOCATION = 6;  //位置
 
 //    // 以下为通知类的消息

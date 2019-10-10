@@ -24,9 +24,9 @@ public class User extends BaseDbModel<User> implements Author, Comparable<User> 
     public static final int SEX_MAN = 1;
     public static final int SEX_WOMAN = 2;
 
-    public static final int ROLE_FRIEND = 1;
-    public static final int ROLE_STRANGER = 2;
-    public static final int ROLE_SELF = 3;
+    public static final int ROLE_FRIEND = 1;     //好友
+    public static final int ROLE_STRANGER = 2;   //陌生人
+    public static final int ROLE_SELF = 3;       //自己
 
     // 主键
     @PrimaryKey

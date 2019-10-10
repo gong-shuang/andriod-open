@@ -61,4 +61,5 @@ dependencies {
 
 //    api project(':factory')
     api project(':base')
+    api project(':IMSDK')
 }

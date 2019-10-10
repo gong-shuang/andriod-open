@@ -107,7 +107,7 @@ dependencies {
     //聊天activity打开出问题，缺少库
     implementation 'de.hdodenhof:circleimageview:2.1.0'
 
-    //
+    //这是个图片剪切库，现在好像没有使用，可以删除
     implementation 'com.yalantis:ucrop:2.2.0-native'
 
     //以上都是各种UI的库。

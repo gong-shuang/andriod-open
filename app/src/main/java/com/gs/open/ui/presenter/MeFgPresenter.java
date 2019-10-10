@@ -1,5 +1,7 @@
 package com.gs.open.ui.presenter;
 
+import android.text.TextUtils;
+
 import com.bumptech.glide.Glide;
 import com.gs.im.data.helper.UserHelper;
 import com.gs.im.model.db.User;
@@ -10,6 +12,7 @@ import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.IMeFgView;
 import com.gs.base.util.LogUtils;
 import com.gs.base.util.UIUtils;
+import com.gs.base.util.RongGenerate;
 
 
 public class MeFgPresenter extends BasePresenter<IMeFgView> {
@@ -27,6 +30,11 @@ public class MeFgPresenter extends BasePresenter<IMeFgView> {
 
         //从本地数据库中获取当前user的信息。
         user = Account.getUser();
+        String portrait = user.getPortrait();
+        if (TextUtils.isEmpty(portrait)) {
+            portrait = RongGenerate.generateDefaultAvatar(user.getName(), user.getId());
+            user.setPortrait(portrait);
+        }
 //        mUserInfo = DBManager.getInstance().getUserInfo(Account.getUserId());
 //        if(mUserInfo == null ){
 //            User user = Account.getUser();

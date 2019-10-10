@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide;
 import com.gs.im.common.app.Application;
 import com.gs.im.common.ui.media.GalleryFragment;
 import com.gs.base.util.UIUtils;
+import com.gs.im.data.helper.UserHelper;
 import com.lqr.optionitemview.OptionItemView;
 import com.gs.open.R;
 import com.gs.open.app.AppConst;
@@ -70,14 +71,9 @@ public class MyInfoActivity extends BaseActivity<IMyInfoAtView, MyInfoAtPresente
     public void initListener() {
         mIvHeader.setOnClickListener(v -> {
             Intent intent = new Intent(MyInfoActivity.this, ShowBigImageActivity.class);
-            intent.putExtra("url", mPresenter.mUserInfo.getPortrait().toString());
+            intent.putExtra("url", UserHelper.getLocalFileAsyncUpdateDB(mPresenter.mUserInfo));
             jumpToActivity(intent);
         });
-        //更换头像，以前的方法，废弃
-//        mLlHeader.setOnClickListener(v -> {
-//            Intent intent = new Intent(this, ImageGridActivity.class);
-//            startActivityForResult(intent, REQUEST_IMAGE_PICKER);
-//        });
         mLlHeader.setOnClickListener(v -> {
             new GalleryFragment()
                     .setListener(new GalleryFragment.OnSelectedListener() {

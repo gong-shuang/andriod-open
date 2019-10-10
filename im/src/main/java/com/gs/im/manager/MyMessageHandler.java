@@ -21,7 +21,7 @@ public class MyMessageHandler {
     private DataSource.SucceedCallback<Message> messageCallback;
     private String sessionID;
 
-    public MyMessageHandler() {
+    private MyMessageHandler() {
         myThread = new MyThread("MyMessage");
         myThread.start();
     }

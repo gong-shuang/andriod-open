@@ -146,5 +146,6 @@
     <orderEntry type="library" name="Gradle: android.arch.core:runtime:1.1.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:multidex:1.0.1@aar" level="project" />
     <orderEntry type="module" module-name="base" />
+    <orderEntry type="module" module-name="IMSDK" />
   </component>
 </module>

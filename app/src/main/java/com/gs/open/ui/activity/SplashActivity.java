@@ -10,8 +10,12 @@ import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
+import com.gs.im.data.helper.AccountHelper;
 import com.gs.im.persistence.Account;
 import com.gs.base.util.LogUtils;
+import com.gs.imsdk.IMClientManager;
+import com.gs.imsdk.event.GetPushIDEvent;
+import com.gs.open.app.MyApp;
 import com.jaeger.library.StatusBarUtil;
 import com.gs.open.R;
 import com.gs.open.ui.base.BaseActivity;
@@ -39,6 +43,21 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     public void init() {
+        //获取pushId，在用户没有登录前获取，
+        IMClientManager.getInstance(MyApp.getContext()).getPushId(new GetPushIDEvent() {
+            @Override
+            public void setPushID(String pushID) {
+                // 设置设备Id
+                Account.setPushId(pushID);
+                if (Account.isLogin()) {
+                    // 账户登录状态，进行一次PushId绑定
+                    // 没有登录是不能绑定PushId的
+                    AccountHelper.bindPush(null);
+                }
+            }
+        });
+
+        //检测权限
         PermissionGen.with(this)
                 .addRequestCode(100)
                 .permissions(

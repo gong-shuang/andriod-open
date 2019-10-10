@@ -45,7 +45,7 @@ import com.gs.open.app.AppConst;
 import com.gs.open.manager.BroadcastManager;
 //import com.gs.open.delete.model.data.LocationData;
 import com.gs.open.ui.base.BaseFragmentActivity;
-import com.gs.open.ui.presenter.UiSessionAtPresenter;
+import com.gs.open.ui.presenter.SessionAtPresenter;
 import com.gs.open.ui.view.ISessionAtView;
 import com.gs.base.util.ImageUtils;
 import com.gs.base.util.UIUtils;
@@ -63,7 +63,7 @@ import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
  * @创建者 CSDN_LQR
  * @描述 会话界面（单聊、群聊）
  */
-public class SessionActivity extends BaseFragmentActivity<ISessionAtView, UiSessionAtPresenter> implements ISessionAtView, IEmotionSelectedListener, BGARefreshLayout.BGARefreshLayoutDelegate {
+public class SessionActivity extends BaseFragmentActivity<ISessionAtView, SessionAtPresenter> implements ISessionAtView, IEmotionSelectedListener, BGARefreshLayout.BGARefreshLayoutDelegate {
 
     public static final int REQUEST_IMAGE_PICKER = 1000;
     public final static int REQUEST_TAKE_PHOTO = 1001;
@@ -138,7 +138,6 @@ public class SessionActivity extends BaseFragmentActivity<ISessionAtView, UiSess
 
         //设置会话已读
 //        RongIMClient.getInstance().clearMessagesUnreadStatus(mConversationType, mSessionId);
-//        registerBR();
     }
 
     @Override
@@ -250,7 +249,9 @@ public class SessionActivity extends BaseFragmentActivity<ISessionAtView, UiSess
                 UIUtils.postTaskDelay(() -> mRvMsg.smoothMoveToPosition(mRvMsg.getAdapter().getItemCount() - 1), 50);
             }
         });
-        mBtnSend.setOnClickListener(v -> mPresenter.sendTextMsg());
+        //文字
+        mBtnSend.setOnClickListener(v -> mPresenter.sendMessageText());
+        //语音
         mBtnAudio.setOnTouchListener((v, event) -> {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
@@ -502,42 +503,9 @@ public class SessionActivity extends BaseFragmentActivity<ISessionAtView, UiSess
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        unRegisterBR();
         mPresenter.dispose();
     }
 
-    private void registerBR() {
-//        BroadcastManager.getInstance(this).register(AppConst.UPDATE_CURRENT_SESSION, new BroadcastReceiver() {
-//            @Override
-//            public void onReceive(Context context, Intent intent) {
-//                Message message = intent.getParcelableExtra("result");
-//                if (message != null) {
-//                    if (message.getTargetId().equals(mSessionId)) {
-//                        mPresenter.receiveNewMessage(message);
-//                    }
-//                }
-//            }
-//        });
-//        BroadcastManager.getInstance(this).register(AppConst.REFRESH_CURRENT_SESSION, new BroadcastReceiver() {
-//            @Override
-//            public void onReceive(Context context, Intent intent) {
-//                mPresenter.loadMessage();
-//            }
-//        });
-//        BroadcastManager.getInstance(this).register(AppConst.UPDATE_CURRENT_SESSION_NAME, new BroadcastReceiver() {
-//            @Override
-//            public void onReceive(Context context, Intent intent) {
-//                setTitle();
-//            }
-//        });
-//        BroadcastManager.getInstance(this).register(AppConst.CLOSE_CURRENT_SESSION, new BroadcastReceiver() {
-//            @Override
-//            public void onReceive(Context context, Intent intent) {
-//                finish();
-//            }
-//        });
-
-    }
 
     private void unRegisterBR() {
         BroadcastManager.getInstance(this).unregister(AppConst.UPDATE_CURRENT_SESSION);
@@ -663,8 +631,8 @@ public class SessionActivity extends BaseFragmentActivity<ISessionAtView, UiSess
     }
 
     @Override
-    protected UiSessionAtPresenter createPresenter() {
-        return new UiSessionAtPresenter(this, mSessionId, mConversationType);
+    protected SessionAtPresenter createPresenter() {
+        return new SessionAtPresenter(this, mSessionId, mConversationType);
     }
 
     @Override

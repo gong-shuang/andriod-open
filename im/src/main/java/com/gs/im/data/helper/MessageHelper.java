@@ -103,6 +103,7 @@ public class MessageHelper {
                 }
 
                 // 直接发送, 进行网络调度
+
                 RemoteService service = Network.remote();
                 service.msgPush(model).enqueue(new Callback<RspModel<MessageCard>>() {
                     @Override

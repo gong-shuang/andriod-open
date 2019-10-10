@@ -15,7 +15,7 @@ import butterknife.BindView;
 
 /**
  * @创建者 CSDN_LQR
- * @描述 附言界面
+ * @描述 添加朋友时， 发送请求消息的界面
  */
 public class PostScriptActivity extends BaseActivity<IPostScriptAtView, PostScriptAtPresenter> implements IPostScriptAtView {
 

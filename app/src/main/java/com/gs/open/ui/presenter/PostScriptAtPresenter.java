@@ -3,6 +3,7 @@ package com.gs.open.ui.presenter;
 import com.gs.im.common.data.DataSource;
 import com.gs.im.data.helper.UserHelper;
 import com.gs.im.model.card.UserCard;
+import com.gs.im.model.db.User;
 import com.gs.open.ui.base.BaseActivity;
 import com.gs.open.ui.base.BasePresenter;
 import com.gs.open.ui.view.IPostScriptAtView;
@@ -51,6 +52,8 @@ public class PostScriptAtPresenter extends BasePresenter<IPostScriptAtView> {
 
             @Override
             public void onDataLoaded(UserCard userCard) {
+                //更新数据库
+                UserHelper.updateUserRole(userCard.getId(), User.ROLE_FRIEND);
                 // 成功
                 final IPostScriptAtView view = getView();
                 if (view != null) {

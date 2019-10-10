@@ -182,5 +182,6 @@
     <orderEntry type="module" module-name="im" />
     <orderEntry type="module" module-name="library" />
     <orderEntry type="module" module-name="base" />
+    <orderEntry type="module" module-name="IMSDK" />
   </component>
 </module>

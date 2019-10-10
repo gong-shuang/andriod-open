@@ -3,6 +3,7 @@ package com.gs.im.data.helper;
 import android.text.TextUtils;
 
 import com.gs.base.util.LogUtils;
+import com.gs.base.util.RongGenerate;
 import com.gs.im.utils.FileUtil;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
@@ -285,8 +286,11 @@ public class UserHelper {
 
     //在主线程中执行
     public static String getLocalFileAsyncUpdateDB(final User user){
-        if(user.getLocalPortrait() != null){
+        if(user.getLocalPortrait() != null) {
             return user.getLocalPortrait();
+        }else if(user.getPortrait() == null){
+            String portrait = RongGenerate.generateDefaultAvatar(user.getName(), user.getId());
+            return portrait;
         }else {
             new Thread(new Runnable() {
                 @Override
@@ -312,5 +316,18 @@ public class UserHelper {
             }).start();
             return user.getPortrait();
         }
+    }
+
+
+    //更新当前user的角色
+    public static void updateUserRole(String userId, int role){
+        User user = findFromLocal(userId);
+        if (user == null) {
+            return ;
+        }
+
+        user.setRole(role);
+        boolean ret = user.save();
+        LogUtils.d("ret:" + ret);
     }
 }

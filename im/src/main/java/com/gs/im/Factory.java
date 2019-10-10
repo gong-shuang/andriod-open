@@ -27,7 +27,7 @@ import com.gs.im.model.card.GroupMemberCard;
 import com.gs.im.model.card.MessageCard;
 import com.gs.im.model.card.UserCard;
 import com.gs.im.persistence.Account;
-import com.gs.im.utils.DBFlowExclusionStrategy;
+import com.gs.im.utils.*;
 
 import java.lang.reflect.Type;
 import java.util.List;
