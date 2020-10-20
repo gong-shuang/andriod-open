@@ -34,7 +34,8 @@ public class IMClientManager {
         if(!init)
         {
             // 设置服务器ip和服务器端口
-            ConfigEntity.serverIP = "192.168.1.101";
+//            ConfigEntity.serverIP = "192.168.1.101";
+            ConfigEntity.serverIP = "172.30.67.71";
             ConfigEntity.serverUDPPort = 7901;
 
             // 开启/关闭DEBUG信息输出
