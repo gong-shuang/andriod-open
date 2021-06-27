@@ -54,6 +54,7 @@ public class MyMessageHandler {
                 if(message ==null){
                     //错误
                     LogUtils.e("My Message queue is null");
+                    throw new RuntimeException("find null of message!");
                 }
 
                 //处理消息
